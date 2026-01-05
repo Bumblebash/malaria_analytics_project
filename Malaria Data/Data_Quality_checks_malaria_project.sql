@@ -61,9 +61,6 @@ FROM malaria_data
    ;
 
 
-
-
-
 --Confirming Total Cases for Masaka City 
 SELECT  TotalCasesConfirmed_BSRDT
            FROM malaria_data
@@ -75,8 +72,73 @@ SELECT  AVG(IncidenceRate) AS avg_incidence FROM malaria_data
 
 WHERE Year = '2024'
 
-
 ;
+
+
+
+
+
+--4/01/2026
+--Confirming Maximum Count of RDT & BS
+SELECT  MIN(TOTAlCasesConfirmed_BSRDT) Max_Case_recorded FROM malaria_data
+     WHERE District = Region
+     AND TOTAlCasesConfirmed_BSRDT > 0 ;
+
+
+--Confirming Minimum Count of RDT & BS
+SELECT  MIN(TOTAlCasesConfirmed_BSRDT) Max_Case_recorded FROM malaria_data
+            WHERE TOTAlCasesConfirmed_BSRDT > 0;
+
+
+-- Records with Just Zero For Total Cases Confirmed
+SElect * from malaria_data 
+            WHERE TOTAlCasesConfirmed_BSRDT = 0;
+
+--5/01/2025
+---Extracting out Year Over Year Change(YoY) %age Change For Regions 
+WITH previous_year_cte AS(
+  SELECT Region, Year, TOTAlCasesConfirmed_BSRDT As Current_Total_Cases, 
+       LAG(TOTAlCasesConfirmed_BSRDT) OVER(PARTITION BY Region ORDER BY Year) As Previous_Total_Cases
+       FROM malaria_data 
+       WHERE Region = District
+       )
+SELECT Region, Year, Current_Total_Cases, Previous_Total_Cases,
+       CASE WHEN Previous_Total_Cases IS NULL THEN NULL --For the Fiest Year
+       WHEN Previous_Total_Cases = 0 THEN NULL  --Avoids Division By Zero
+       ELSE 
+    ROUND((Current_Total_Cases - Previous_Total_Cases) * 100 / Previous_Total_Cases , 2)  ---Logic in division 
+       END AS Y_0_Y_Change
+       FROM previous_year_cte;
+
+
+    /** METHOD II **/
+WITH previous_year_cte AS(
+  SELECT Region, Year, TOTAlCasesConfirmed_BSRDT As Current_Total_Cases, 
+       LAG(TOTAlCasesConfirmed_BSRDT) OVER(PARTITION BY Region ORDER BY Year) As Previous_Total_Cases
+       FROM malaria_data 
+       WHERE Region = District AND Region <> '0' AND Region IS NOT NULL
+       )
+SELECT Region, Year, Current_Total_Cases, Previous_Total_Cases,
+       CASE WHEN Previous_Total_Cases IS NULL THEN NULL --For the First Year
+       WHEN Previous_Total_Cases = 0 THEN NULL  --Avoids Division By Zero
+       ELSE 
+ CAST(ROUND(
+   (CAST(Current_Total_Cases AS DECIMAL(18,2)) --- Assign Every Column with Cast AS DECIMAL(18,2)
+    - CAST(Previous_Total_Cases AS DECIMAL(18,2)))
+   / CAST(Previous_Total_Cases AS DECIMAL(18,2)) * 100, 
+2) AS DECIMAL(18,2) )   ---Logic in division 
+       END AS Y_0_Y_Change
+       FROM previous_year_cte;
+
+
+--Confirming   Datatypes 
+EXEC sp_help 'malaria_data';
+
+
+
+
+
+
 
 
 
