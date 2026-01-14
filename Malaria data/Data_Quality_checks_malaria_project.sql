@@ -165,6 +165,61 @@ SELECT
                 FROM treated_cases_cte
                  ORDER BY region , Year;
 
+/**13/01/2026**/
+--Cases Treated Vs Cases Confirmed 
+
+WITH treated_cases_cte AS (
+SELECT 
+       Year,
+       SUM(TOTAlCasesConfirmed_BSRDT) As Total_Cases,
+       SUM([0_28Days_CT_Total] + 
+       [29Days_4Yrs_CT_Total] + 
+       [5_9YRS_CT_Total] + 
+       [10_19YRS_CT_Total] + 
+       [20+YRS_CT_Total]) As total_Cases_Treated 
+    FROM malaria_data 
+       WHERE Region = District AND Region <> '0'
+    GROUP BY  Year
+   
+   )
+       SELECT 
+       Year, 
+       Total_Cases, 
+       total_Cases_Treated, 
+       CAST(ROUND( (CAST((total_Cases_Treated) AS DECIMAL(18,2))/ CAST((Total_Cases) AS Decimal(18,2)) ) * 100, 2) AS DECIMAL(18,2)) As Percentage_Treatment_Coverage 
+                FROM treated_cases_cte
+                 ORDER BY  Year;
+
+
+--Considering  GrandTotal Cases
+
+
+WITH treated_cases_cte AS (
+SELECT 
+       Year,
+       SUM(TOTAlCasesConfirmed_BSRDT) As Total_Cases_Confirmed,
+       SUM(GrandTotalCases) As Total_Cases,
+       SUM([0_28Days_CT_Total] + 
+       [29Days_4Yrs_CT_Total] + 
+       [5_9YRS_CT_Total] + 
+       [10_19YRS_CT_Total] + 
+       [20+YRS_CT_Total]) As total_Cases_Treated 
+    FROM malaria_data 
+       WHERE Region = District AND Region <> '0'
+    GROUP BY  Year
+   
+   )
+       SELECT 
+       Year, 
+       Total_Cases,
+       Total_Cases_Confirmed,
+       total_Cases_Treated, 
+       CAST(ROUND( (CAST((total_Cases_Treated) AS DECIMAL(18,2))/ CAST((Total_Cases) AS Decimal(18,2)) ) * 100, 2) AS DECIMAL(18,2)) As Percentage_Treatment_Coverage 
+                FROM treated_cases_cte
+                 ORDER BY  Year;
+
+
+
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -385,4 +440,25 @@ WITH total_Cases_cte AS(
          total_cases, Total_female_Cases, Total_Male_Cases,
          CAST( ROUND((CAST([Total_female_Cases] AS DECIMAL(18,2)) / CAST( total_cases AS DECIMAL(18,2)) * 100),2) AS DECIMAL(18,2)) AS Percentage_Total_Cases_Female,
          CAST( ROUND((CAST([Total_Male_Cases] AS DECIMAL(18,2)) / CAST( total_cases AS DECIMAL(18,2)) * 100),2) AS DECIMAL(18,2)) AS Percentage_Total_Cases_Male
+    FROM total_Cases_cte ;
+
+    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    /**14/01/2026**/
+       WITH total_Cases_cte AS(
+        SELECT 
+        Region,
+        Year, 
+        SUM(TOTAlCasesConfirmed_BSRDT) As total_cases, 
+        SUM(
+    FROM malaria_data
+        WHERE Region = District AND Region <> '0'
+        GROUP BY Year
+)
+    SELECT 
+         
+         Year, 
+         total_cases, [total_cases_btn(5_9)] , 
+         CAST( ROUND((CAST([total_cases_btn(5_9)] AS DECIMAL(18,2)) / CAST( total_cases AS DECIMAL(18,2)) * 100),2) AS DECIMAL(18,2)) AS [5_9_yrs_by_percentage]
     FROM total_Cases_cte ;
