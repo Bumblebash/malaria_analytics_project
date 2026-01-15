@@ -445,20 +445,34 @@ WITH total_Cases_cte AS(
     ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    /**14/01/2026**/
-       WITH total_Cases_cte AS(
-        SELECT 
-        Region,
-        Year, 
-        SUM(TOTAlCasesConfirmed_BSRDT) As total_cases, 
-        SUM(
-    FROM malaria_data
-        WHERE Region = District AND Region <> '0'
-        GROUP BY Year
-)
-    SELECT 
-         
-         Year, 
-         total_cases, [total_cases_btn(5_9)] , 
-         CAST( ROUND((CAST([total_cases_btn(5_9)] AS DECIMAL(18,2)) / CAST( total_cases AS DECIMAL(18,2)) * 100),2) AS DECIMAL(18,2)) AS [5_9_yrs_by_percentage]
-    FROM total_Cases_cte ;
+
+--15/01/2025
+--Confirming Malaria Cases Confirmed for Kampala 2021 and 2020
+SELECT TOTAlCasesConfirmed_BSRDT AS total_cases ,
+ District 
+ FROM malaria_data
+ WHERE  Year = '2020' AND DISTRICT = 'Kampala district' ;
+
+
+ SELECT TOTAlCasesConfirmed_BSRDT AS total_cases ,
+Region
+ FROM malaria_data
+ WHERE  Year = '2021' AND Region = 'Kampala' AND District = Region;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--16/01/2026
+--Confirming Cases Treated as pre 2021
+ SELECT 
+       SUM([0_28Days_CT_Total] + 
+       [29Days_4Yrs_CT_Total] + 
+       [5_9YRS_CT_Total] + 
+       [10_19YRS_CT_Total] + 
+       [20+YRS_CT_Total]) As total_Cases_Treated 
+    FROM malaria_data 
+    WHERE Year = 2021
+    ;
+  
+   
