@@ -478,4 +478,8 @@ Region
 
 ---17/01/2025
 
-   
+   SELECT Region, SUM(IncidenceRate) As Total_Incidence_Rates, Year
+    FROM malaria_data
+    GROUP BY Region, Year;
+
+    SELECT * from malaria_data;
