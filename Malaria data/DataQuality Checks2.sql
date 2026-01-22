@@ -1,10 +1,12 @@
 USE PRACTICE1;
 
+---Retrieving all data in malaria_dataset from the database
 SELECT * from malaria_data1;
 
+--Counting(Confirming) the Available Columns 
 SELECT COUNT(DISTINCT(column1)) FROM malaria_data;
 
-SELECT DISTINCT(column1) FROM malaria_data;
+
 
 --Counting the total Number of Columns Present
 SELECT COUNT(*) AS NumberOfColumns
@@ -197,7 +199,9 @@ SELECT COUNT(*)  From malaria_data;
 		FROM malaria_data
   ) AND Year = '2020'
   ;
+  
 
+  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   /** PERFOMING DATA QUALITY CHECKS ON B/S & RDT confirmed **/
 
   WITH Total_cases As(
@@ -215,9 +219,9 @@ SELECT COUNT(*)  From malaria_data;
   SELECT SUM(TotalConfirmed_2020) As Total_cases
   FROM Total_cases;
 
+  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
+  --Confirming Total Cases Confirmed(B/S & RDT) As per 2020 per Region  
   SELECT Region, SUM(TotalCasesConfirmed_BSRDT) AS TotalConfirmed_2020
 FROM malaria_data
 WHERE Region IN (
@@ -228,39 +232,44 @@ AND Year = 2020
 GROUP BY Region
 ORDER BY Region;
 
-SELECT Region, SUM(TotalCasesConfirmed_BSRDT) AS TotalConfirmed_2020
-FROM malaria_data
-WHERE Region IN (
-    SELECT DISTINCT District
-    FROM malaria_data
-)
-AND Year = 2020
---AND Region <> District
-GROUP BY Region
-ORDER BY Region;
-
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Total Cases Confirmed(B/S & RDT) from all 15 Ugandan Regions as per 2020
 WITH Total_Cases2_cte AS(
-SELECT Region, TotalCasesConfirmed_BSRDT
-FROM malaria_data
-WHERE Region = District
-AND Year = 2020
---ORDER BY Region
-)
---SELECT * FROM Total_Cases2_cte;
+        SELECT 
+        Region, 
+        TotalCasesConfirmed_BSRDT
+        FROM malaria_data
+        WHERE Region = District
+        AND Year = 2020
+        )
 SELECT SUM(TotalCasesConfirmed_BSRDT) As Total_Cases1
 FROM Total_Cases2_cte;
 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--Confirming Total Cases for [10-19Days_Total] registered in  Lango Region as per 2020
 WITH Total_cte AS (
-SELECT Region, District, [10_19Days_Total] FROM malaria_data
-WHERE Region = 'Lango' AND YEAR = '2020'
-)
---SELECT * FROM Total_cte;
+        SELECT 
+        Region, 
+        District, 
+        [10_19Days_Total] 
+    FROM malaria_data
+        WHERE Region = 'Lango' AND YEAR = '2020'
+        )
+    SELECT 
+        Region, 
+        SUM([10_19Days_Total]) As total_cases
+    FROM Total_cte
+GROUP BY Region;
 
-SELECT SUM([10_19Days_Total]) As total_cases
-FROM Total_cte;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
---Total population By District 
+--Total population by  District as per 2021 
 SELECT 
     Year,
     SUM(TotalPopulation) AS total_population
@@ -269,38 +278,43 @@ WHERE Year = 2021
   AND LOWER(District) LIKE '% district'
 GROUP BY Year;
 
+ --Note: LOWER converts all character in a string to lower Case
 
---Total Population by region
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-    WITH valid_districts AS (
+
+--Confirming Total Population by District Level As per 2020 for selected Districts (Ankole Region) 
+WITH valid_districts AS (
     SELECT *
     FROM malaria_data
     WHERE LOWER(District) LIKE '%district%'
-)
+ )
 SELECT 
-    Year,
-    SUM(TotalPopulation) AS total_population
-FROM valid_districts
-WHERE Year = 2020
-AND District IN ('Buhweju District','Bushenyi District', 'Ibanda District', 'Isingiro District','Kazo District','Kiruhura District', 
-'Mbarara District', 'Mitooma District', 'Ntugamo District', 'Rubirirzi District', 'Rwampara District',
-'Sheema District', 'Mbarara City')
+        Year,
+        SUM(TotalPopulation) AS total_population
+   FROM valid_districts
+   WHERE Year = 2020
+                AND District IN ('Buhweju District','Bushenyi District', 'Ibanda District', 'Isingiro District','Kazo District','Kiruhura District', 
+    'Mbarara District', 'Mitooma District', 'Ntugamo District', 'Rubirirzi District', 'Rwampara District',
+    'Sheema District', 'Mbarara City')
 GROUP BY Year;
 
 
---Region Level
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Total population Per Region Level(Ankole Region)
 SELECT
-Year,
-SUM(TotalPopulation) AS Total_Population
-FROM malaria_data
-WHERE Region = District AND  Year = 2020
-AND Region = 'Ankole'
+    Year,
+    SUM(TotalPopulation) AS Total_Population
+    FROM malaria_data
+ WHERE Region = District AND  Year = 2020
+      AND Region = 'Ankole'
 
 GROUP BY  Year;
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+--Confiming Total Population For Mbarara District as per 2020
     WITH valid_districts AS (
     SELECT *
     FROM malaria_data
@@ -315,12 +329,19 @@ WHERE Year = 2020
 AND District IN ( 'Mbarara district')
 GROUP BY Year;
 
---Find Out How many Districts do we have
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--Find Out How many Districts and Regions  we have in our Dataset As per 2020
+
+/**Districts**/
 SELECT COUNT(*) As TotalDistricts 
  FRom malaria_data 
  WHERE LOWER(District) LIKE '%district%' AND Year = 2020;
 
 
+
+ /**Regions**/
 --Find Out How many Regions we have
  SELECT COUNT(*) As TotalRegions 
  FRom malaria_data 
@@ -329,87 +350,89 @@ SELECT COUNT(*) As TotalDistricts
 
 
  ---19/01/2026
+ --Retrieving data from an Corrected  Merged  Malaria dataset 
  SELECT * FROM malaria_data1;
 
- --------------------------------------------------------------------------------------------------------------------------------------------------------
- --------------------------------------------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
- --U5 Cases per Year Strictly
+ --U5(<5yr) Cases per Year Strictly(From 2020 to 2024)
 
 WITH Total_cases_cte AS(
-SELECT 
-
-       Year,
-      SUM( TOTAlCasesConfirmed_BSRDT ) As Total_Cases,
-       SUM(
-       [0_28Days(BSRDT)_Total]+
-       [29Days_4Yrs(BSRDT)_Total]
-       ) AS U5TotalCases
+    SELECT 
+           Year,
+          SUM( TOTAlCasesConfirmed_BSRDT ) As Total_Cases,
+           SUM(
+           [0_28Days(BSRDT)_Total]+
+           [29Days_4Yrs(BSRDT)_Total]
+           ) AS U5TotalCases
     FROM malaria_data1 
        WHERE Region = District AND Region <> '0' 
     GROUP BY  Year
     )
-     SELECT 
+ SELECT 
      Year, 
      Total_Cases, 
      U5TotalCases,
      CAST(ROUND((CAST((U5TotalCases) AS DECIMAL(18,2)) / CAST((Total_Cases) AS DECIMAL (18,2) )) * 100,2) AS DECIMAL(18,2)) AS U5YrBurden
-     FROM Total_cases_cte
+  FROM Total_cases_cte
       ORDER BY Year ASC;
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-----Cases Treated Vs Cases Confirmed 
+----Percentage Cases Treated Vs Cases Confirmed 
 
 WITH treated_cases_cte AS (
-SELECT 
-       Year,
-       SUM(TOTAlCasesConfirmed_BSRDT) As Total_Cases,
-       SUM([0_28Days_CT_Total] + 
-       [29Days_4Yrs_CT_Total] + 
-       [5_9YRS_CT_Total] + 
-       [10_19YRS_CT_Total] + 
-       [20+YRS_CT_Total]) As total_Cases_Treated 
-    FROM malaria_data1 
-       WHERE Region = District AND Region <> '0'
-    GROUP BY  Year
+    SELECT 
+           Year,
+           SUM(TOTAlCasesConfirmed_BSRDT) As Total_Cases,
+           SUM([0_28Days_CT_Total] + 
+           [29Days_4Yrs_CT_Total] + 
+           [5_9YRS_CT_Total] + 
+           [10_19YRS_CT_Total] + 
+           [20+YRS_CT_Total]) As total_Cases_Treated 
+        FROM malaria_data1 
+           WHERE Region = District AND Region <> '0'
+        GROUP BY  Year
    
-   )
-       SELECT 
-       Year, 
-       Total_Cases, 
-       total_Cases_Treated, 
-       CAST(ROUND( (CAST((total_Cases_Treated) AS DECIMAL(18,2))/ CAST((Total_Cases) AS Decimal(18,2)) ) * 100, 2) AS DECIMAL(18,2)) As Percentage_Treatment_Coverage 
-                FROM treated_cases_cte
-                 ORDER BY  Year;
+       )
+ SELECT 
+           Year, 
+           Total_Cases, 
+           total_Cases_Treated, 
+           CAST(ROUND( (CAST((total_Cases_Treated) AS DECIMAL(18,2))/ CAST((Total_Cases) AS Decimal(18,2)) ) * 100, 2) AS DECIMAL(18,2)) As Percentage_Treatment_Coverage 
+FROM treated_cases_cte
+ORDER BY  Year;
 
 
-
+---------------------------------------------------------------------------------------------------------------------------------
 
 /**Extracting Cases Treated Vs Cases Confirmed**/
 
 WITH treated_cases_cte AS (
-SELECT 
+        SELECT 
+               Region, 
+               Year,
+               TOTAlCasesConfirmed_BSRDT As Total_Cases,
+               SUM([0_28Days_CT_Total] + 
+               [29Days_4Yrs_CT_Total] + 
+               [5_9YRS_CT_Total] + 
+               [10_19YRS_CT_Total] + 
+               [20+YRS_CT_Total]) As total_Cases_Treated 
+            FROM malaria_data1 
+               WHERE Region = District AND Region <> '0'
+            GROUP BY Region,TOTAlCasesConfirmed_BSRDT, Year
+           )
+ SELECT 
        Region, 
-       Year,
-       TOTAlCasesConfirmed_BSRDT As Total_Cases,
-       SUM([0_28Days_CT_Total] + 
-       [29Days_4Yrs_CT_Total] + 
-       [5_9YRS_CT_Total] + 
-       [10_19YRS_CT_Total] + 
-       [20+YRS_CT_Total]) As total_Cases_Treated 
-    FROM malaria_data1 
-       WHERE Region = District AND Region <> '0'
-    GROUP BY Region,TOTAlCasesConfirmed_BSRDT, Year
-   
-   )
-       SELECT Region, 
        Year, 
        Total_Cases, 
        total_Cases_Treated, 
        CAST(ROUND( (CAST((total_Cases_Treated) AS DECIMAL(18,2))/ CAST((Total_Cases) AS Decimal(18,2)) ) * 100, 2) AS DECIMAL(18,2)) As Percentage_Treatment_Coverage 
-                FROM treated_cases_cte
-                 ORDER BY region , Year;
+FROM treated_cases_cte
+        ORDER BY region , Year;
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 --5-9YRS AGE CATEGORY 
@@ -432,7 +455,7 @@ WITH total_Cases_cte AS(
          CAST( ROUND((CAST([total_cases_btn(5_9)] AS DECIMAL(18,2)) / CAST( total_cases AS DECIMAL(18,2)) * 100),2) AS DECIMAL(18,2)) AS [5_9_yrs_by_percentage]
     FROM total_Cases_cte ;
 
-
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ----Percentage  By Year(Strictly) per 5_9_Yrs_By_Percentage
     WITH total_Cases_cte AS(
@@ -451,46 +474,47 @@ WITH total_Cases_cte AS(
     FROM total_Cases_cte ;
 
 
-
-
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     --11/01/2025
--------------------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
    --ADULTS (10-20+YRS)
 /**Extracting Percentage Burden in Adults Per Year Per Region*/
 --(10-19yrs) & (20+Yrs) Age Bracket
 WITH adult_cte AS(
-SELECT 
-Region , 
-    Year,
-     TOTAlCasesConfirmed_BSRDT AS total_Cases, 
-    SUM([10_19YRS(BSRDT)_Total] + [20+YRS_(BSRDT)_Total]) AS Total_Adult_Cases
-FROM malaria_data1
-    WHERE Region = District AND Region <> '0'
-    GROUP BY Region, Year, TOTAlCasesConfirmed_BSRDT
-    )
+        SELECT 
+                   Region , 
+                    Year,
+                    TOTAlCasesConfirmed_BSRDT AS total_Cases, 
+                    SUM([10_19YRS(BSRDT)_Total] + [20+YRS_(BSRDT)_Total]) AS Total_Adult_Cases
+            FROM malaria_data1
+            WHERE Region = District AND Region <> '0'
+            GROUP BY Region, Year, TOTAlCasesConfirmed_BSRDT
+        )
 
-    SELECT Region,
+    SELECT 
+           Region,
            Year,
            total_cases,
            Total_Adult_Cases,
            CAST(ROUND(((CAST((Total_Adult_Cases) AS DECIMAL(18,2)) / CAST((total_cases) AS DECIMAl(18,2))) * 100),2) AS DECIMAL(18,2)) AS Adult_percentage
     FROM adult_cte ;
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-     --Strictly Percentage by Age Group (ADULT) Per Year 
 
-    WITH adult_cte AS(
-SELECT 
-    Year,
-     SUM(TOTAlCasesConfirmed_BSRDT) AS total_Cases, 
-    SUM([10_19YRS(BSRDT)_Total] + [20+YRS_(BSRDT)_Total]) AS Total_Adult_Cases
-FROM malaria_data
-    WHERE Region = District AND Region <> '0'
-    GROUP BY  Year
-    )
+-----Strictly Percentage by Age Group (ADULT) Per Year 
 
+WITH adult_cte AS(
+    SELECT 
+         Year,
+         SUM(TOTAlCasesConfirmed_BSRDT) AS total_Cases, 
+        SUM([10_19YRS(BSRDT)_Total] + [20+YRS_(BSRDT)_Total]) AS Total_Adult_Cases
+        FROM malaria_data
+            WHERE Region = District AND Region <> '0'
+            GROUP BY  Year
+            )
     SELECT
            Year,
            total_cases,
@@ -532,8 +556,8 @@ FROM malaria_data
          CAST( ROUND((CAST([Total_Male_Cases] AS DECIMAL(18,2)) / CAST( total_cases AS DECIMAL(18,2)) * 100),2) AS DECIMAL(18,2)) AS Percentage_Total_Cases_Male
     FROM total_Cases_cte ;
 
-    ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -555,10 +579,15 @@ SELECT Region, Year, Current_Total_Cases, Previous_Total_Cases,
    AS DECIMAL(18,2) )   ---Logic in division 
        END AS Y_0_Y_Change
        FROM previous_year_cte;
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+--Confirming Incidence Rates Per North Centtral Region
+ SELECT 
+     Region, 
+     SUM(IncidenceRate) As Total_Incidence_Rates, Year
+FROM malaria_data1
+    WHERE Region = District AND Year = 2024 AND Region = 'North Central'
+GROUP BY Region, Year;
 
---Confirming Incidence Rates Per Region
- SELECT Region, SUM(IncidenceRate) As Total_Incidence_Rates, Year
-    FROM malaria_data1
-    GROUP BY Region, Year;
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
