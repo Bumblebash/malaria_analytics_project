@@ -8,6 +8,7 @@ SELECT COUNT(DISTINCT(column1)) FROM malaria_data;
 
 
 
+
 --Counting the total Number of Columns Present
 SELECT COUNT(*) AS NumberOfColumns
 FROM INFORMATION_SCHEMA.COLUMNS

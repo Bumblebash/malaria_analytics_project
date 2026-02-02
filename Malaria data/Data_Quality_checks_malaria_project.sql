@@ -1,6 +1,6 @@
 USE Practice1;
 
---Retrieving Data from database for malaria dataset
+--Retrieving Data from database for malaria demorgraphics
 SELECT * FROM malaria_data;
 
 -----Total Population From North Central for year 2024
