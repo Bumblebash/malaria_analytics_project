@@ -1,4 +1,4 @@
-USE PRACTICE1;
+USE Malaria_DB;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --DATE DIMENSION (DateDim)
@@ -16,6 +16,7 @@ CREATE TABLE DimDate(
 --Confirming datatypes for Date Dimensional table.
 Exec sp_help DimDate;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 --REGION DIMENSIONAL TABLE(DimRegion)
 CREATE TABLE DimRegion (
    RegionKey INT IDENTITY(1,1) PRIMARY KEY,
@@ -54,12 +55,13 @@ CREATE TABLE DimAgeGroup(
 );
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 --GENDER DIMESNSION(DimGender)
 CREATE TABLE DimGender(
     GenderKey INT IDENTITY(1,1) PRIMARY KEY,
 	Gender VARCHAR(10) NOT NULL UNIQUE 
 );
-
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -106,6 +108,75 @@ CREATE  TABLE FactMalaria (
 			REFERENCES DimGender(GenderKey)
 );
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--SPATIAL STATISTICS(FactSpatialStats)
+
+CREATE TABLE FactSpatialStats(
+
+    SpatialID  INT IDENTITY(1,1) PRIMARY KEY,
+
+	DistrictKey INT NOT NULL,
+	DateKey    INT NOT NULL,
+
+
+	MoranI   DECIMAL(10,6),
+	Zscore   DECIMAL(10,4),
+	PValue   DECIMAL(10,6),
+
+
+	ClusterType    VARCHAR(20),
+
+	CONSTRAINT FK_Spatial_District
+			FOREIGN KEY (DistrictKey)
+			REFERENCES DimDistrict(DistrictKey),
+
+	CONSTRAINT FK_Spatial_Date 
+			FOREIGN KEY (DateKey)
+			REFERENCES DimDate(DateKey)
+);
+
+----------------------------------------------------------------------------------------------------------------------
+
+--ETL Control Tables (Engineering Layer)
+/**LOAD LOG **/
+CREATE TABLE ETL_LoadLog(
+		LoadID    INT IDENTITY  PRIMARY KEY,
+		SourceFile  VARCHAR(200),
+		StartTime   DATETIME,
+		EndTime     DATETIME,
+		Status      VARCHAR(20),
+		RowsLoaded  INT,
+		ErrorMsg    VARCHAR(500)
+); 
+
+--NOTE : ETL_LoadLog is used for auditing Loads 
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--DATA QUALITY  TABLE
+CREATE TABLE DataQualityChecks(
+		CheckID  INT IDENTITY PRIMARY KEY,
+		CheckName VARCHAR(100),
+		TableName  VARCHAR(100),
+		IssueCount  INT,
+		CheckDate  DATETIME
+);
+
+--This supports Governance.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--INDEXING(PERFOMANCE)
+CREATE NONCLUSTERED INDEX IX_Fact_Date
+ON FactMalaria(DateKey);
+
+
+CREATE NONCLUSTERED INDEX IX_Fact_District
+ON FactMalaria(DistrictKey);
+
+CREATE NONCLUSTERED INDEX IX_Fact_Region
+ON FactMalaria(RegionKey);
 
 
 
@@ -122,4 +193,3 @@ CREATE  TABLE FactMalaria (
 
 
 
-)
