@@ -180,16 +180,20 @@ ON FactMalaria(RegionKey);
 
 
 
+--4/02/2026
+--DROPPING WRONG/FAULTY CONSTRAINT
+ALTER TABLE FactMalaria
+DROP CONSTRAINT FK_Fact_Date;
+
+
+--ADDING A CORRECTED CONSTRAINT KEY
+ALTER TABLE FactMalaria 
+ADD CONSTRAINT FK_Fact_Date 
+	FOREIGN KEY (DateKey)
+	REFERENCES DimDate(DateKey);
 
 
 
-
-
-
-
-
-
-
-
+sp_help FactMalaria;
 
 
