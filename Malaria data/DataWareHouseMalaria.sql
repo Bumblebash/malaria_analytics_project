@@ -193,7 +193,45 @@ ADD CONSTRAINT FK_Fact_Date
 	REFERENCES DimDate(DateKey);
 
 
-
+--05/02/2025
+--Checking out the information about FactMalaria 
 sp_help FactMalaria;
 
+
+
+--Copying Malariadata into malaria DB 
+SELECT *
+INTO Malaria_DB.dbo.malaria_data1
+FROM Practice1.dbo.malaria_data1;
+
+SELECT * FROM malaria_data1;
+
+
+--CREATING A STAGING LAYER
+CREATE TABLE Stg_Malaria(
+	Region VARCHAR(100),
+	District VARCHAR(120),
+	Year INT,
+	Month INT,
+	AgeGroup VARCHAR(50),
+	Gender VARCHAR(10),
+
+	ConfirmedCases INT,
+	TreatedCases INT,
+	Population INT
+
+);
+
+--LOADIG DATA INTO THE STAGING LAYER
+INSERT INTO Stg_Malaria (Region, District, Year, ConfirmedCases, TreatedCases, Population) 
+SELECT 
+	Region,
+	District,
+	Year,
+	[TotalCasesConfirmed_BSRDT] As ConfirmedCases,
+	[TOTAL_CASES_TREATED] AS TreatedCases,
+	TotalPopulation AS Population
+FROM malaria_data1;
+
+SELECT * FROM Stg_Malaria;
 
