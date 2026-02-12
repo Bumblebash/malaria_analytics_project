@@ -1,15 +1,15 @@
-USE Malaria_DB
+USE Malaria_DB;
 
 --19/02/2026
 --INSERTING/INGESTION OF DATA INTO STAGING LAYER
 
 --2020DATA
-INSERT INTO Stg_Malaria(Region, District,Year, Month, AgeGroup, ConfirmedCases, TreatedCases, Population)
+/**INSERT INTO Stg_Malaria(Region, District,Year, Month, AgeGroup, ConfirmedCases, TreatedCases, Population)
 SELECT 
 	[orgunitlevel2] AS Region,
 	[orgunitlevel3] AS District,
 	Year,
-	,
+	,**/
 
 
 
@@ -22,7 +22,7 @@ WITH Unpivoted AS(
 		FROM Malaria2020
 		UNPIVOT (
 			value FOR ColName IN (
-				[105-EP01b. Malaria Total 0-28Dys, Female January 2020],
+				-- CAST([105-EP01b. Malaria Total 0-28Dys, Female January 2020] AS INT)  AS [105-EP01b. Malaria Total 0-28Dys, Female January 2020],
 				[105-EP01b. Malaria Total 0-28Dys, Female February 2020],
 				[105-EP01b. Malaria Total 0-28Dys, Female March 2020],
 				[105-EP01b. Malaria Total 0-28Dys, Female April 2020],
@@ -36,7 +36,7 @@ WITH Unpivoted AS(
 				[105-EP01b. Malaria Total 0-28Dys, Female December 2020],
 				[105-EP01b. Malaria Total 0-28Dys, Male January 2020],
 				[105-EP01b. Malaria Total 0-28Dys, Male February 2020],
-				[05-EP01b. Malaria Total 0-28Dys, Male March 2020],
+				[105-EP01b. Malaria Total 0-28Dys, Male March 2020],
 				[105-EP01b. Malaria Total 0-28Dys, Male April 2020],
 				[105-EP01b. Malaria Total 0-28Dys, Male May 2020],
 				[105-EP01b. Malaria Total 0-28Dys, Male June 2020],
@@ -128,7 +128,7 @@ WITH Unpivoted AS(
 				[105-EP01b. Malaria Total 5-9Yrs, Female August 2020],
 				[105-EP01b. Malaria Total 5-9Yrs, Female September 2020],
 				[105-EP01b. Malaria Total 5-9Yrs, Female October 2020],
-				[105-EP01b. Malaria Total 5-9Yrs, Female November  2020],
+				[105-EP01b. Malaria Total 5-9Yrs, Female November 2020],
 				[105-EP01b. Malaria Total 5-9Yrs, Female December 2020],
 				[105-EP01b. Malaria Total 5-9Yrs, Male January 2020],
 				[105-EP01b. Malaria Total 5-9Yrs, Male February 2020],
@@ -141,11 +141,50 @@ WITH Unpivoted AS(
 				[105-EP01b. Malaria Total 5-9Yrs, Male September 2020],
 				[105-EP01b. Malaria Total 5-9Yrs, Male October 2020],
 				[105-EP01b. Malaria Total 5-9Yrs, Male November 2020],
-				[105-EP01b. Malaria Total 5-9Yrs, Male December 2020],
+				[105-EP01b. Malaria Total 5-9Yrs, Male December 2020]
 				
 			
-			)
+			
+	)
+	) u
+),
+Parsed AS (
+   SELECT 
+       Region,
+	   District,
+	   Value AS ConfirmedCases,
+	   CAST(RIGHT(ColName, 4) AS INT) AS Year,
 
+	   CASE 
+	      WHEN ColName LIKE '%January%' THEN 1
+		  WHEN ColName LIKE '%February%' THEN 2
+		  WHEN ColName LIKE '%March%' THEN 3
+		  WHEN ColName LIKE '%April%' THEN 4
+		  WHEN ColName LIKE '%May%' THEN 5
+		  WHEN ColName LIKE '%June%' THEN 6
+		  WHEN ColName LIKE '%July%' THEN 7
+		  WHEN ColName LIKE '%August%' THEN 8
+		  WHEN ColName LIKE '%September%' THEN 9
+		  WHEN ColName LIKE '%October%' THEN 10
+		  WHEN ColName LIKE '%November%' THEN 11
+		  WHEN ColName LIKE '%December%' THEN 12
+		END AS Month,
 
+		--AGE GROUP
+		CASE 
+			WHEN ColName LIKE '%0-28Dys%' THEN '0-28Dys'
+			WHEN ColName LIKE '%29Dys-4yrs%' THEN '29Days-4yrs'
+			WHEN ColName LIKE '%5-9yrs%' THEN '5-9yrs'
+			WHEN ColName LIKE '%10-19Yrs%' THEN '10-19yrs'
+			WHEN ColName LIKE '%20+Yrs%' THEN '20+'
+		END AS AgeGroup,
+
+		--GENDER
+		CASE 
+			WHEN ColName LIKE '%Female%' THEN 'Female'
+			WHEN ColName LIKE '%Male%' THEN 'Male'
+		END AS Gender 
+	FROM Unpivoted
 )
+SELECT * FROM Parsed;
 
