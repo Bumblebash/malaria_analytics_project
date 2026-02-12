@@ -235,3 +235,96 @@ FROM malaria_data1;
 
 SELECT * FROM Stg_Malaria;
 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--7/02/2026
+--POPULATING DIMENSION TABLES(Date Dim, RegionDim, District Dim)
+
+
+-- LOAD DATEDIMESION
+INSERT INTO Dimdate
+ SELECT DISTINCT
+        Year*10000 + Month*100 + 1 AS DateKey,
+		DATEFROMPARTS(Year, Month, 1),
+		Year,
+		DATEPART(QUARTER, DATEFROMPARTS(Year, Month, 1)),
+		Month,
+		DATENAME(MONTH, DATEFROMPARTS(Year,Month,1)),
+		CONCAT(Year, '_', RIGHT('0' +CAST(Month AS VARCHAR), 2))
+FROM Stg_Malaria;
+
+
+
+
+--LOAD DimensionRegion
+INSERT INTO DimRegion
+		SELECT DISTINCT Region
+		FROM Stg_Malaria;
+
+--Confirming Dimension table information for Regions
+SELECT * FROM DimRegion;
+
+
+--LOAD District Dimension
+INSERT INTO DimDistrict(DistrictName, RegionKey)
+		SELECT DISTINCT
+		s.District,
+		r.RegionKey
+FROM Stg_Malaria s
+JOIN DimRegion r
+     ON s.Region = r.Region
+WHERE NOT EXISTS (
+	SELECT 1 FROM DimDistrict d 
+	WHERE d.Districtname = s.District
+);
+
+--Confirm data Inside the dimension table
+SELECT * FROM DimDistrict;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--LOAD AGE GROUPS (We dont have 
+INSERT INTO DimAgeGroup 
+SELECT DISTINCT 
+
+
+--LOAD FACT TABLE
+INSERT INTO FactMalaria
+(
+DateKey,
+DistrictKey,
+RegionKey,
+RegionKey,
+AgeKey,
+GenderKey,
+ConfirmedCases,
+TreatedCases,
+Population
+)
+SELECT 
+  d.DateKey,
+  di.DistrictKey,
+  r.RegionKey,
+  a.AgeKey,
+  g.GenderKey,
+
+  s.ConfirmedCases,
+  s.TreatedCases,
+  s.Population
+
+FROM Stg_Malaria s
+
+JOIN DimRegion r
+ON r.Region  =  s.rEGION
+
+JOIN DimDistrict di
+     ON di.DistrictName = s.District
+
+JOIN DimAgeGroup a
+ON a.AgeGroup = s.AgeGroup
+
+JOIN DimGender g
+ON g.Gender = s.Gender;
+
+
