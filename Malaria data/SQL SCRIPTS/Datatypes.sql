@@ -1,6 +1,5 @@
 USE Malaria_DB;
 
-ALTER TABLE Malaria2020		ALTER COLUMN Population FLOAT(18,4);
 ALTER TABLE Malaria2020 ALTER COLUMN [105-EP01b. Malaria Total 0-28Dys, Female February 2020] INT;
 ALTER TABLE Malaria2020 ALTER COLUMN [105-EP01b. Malaria Total 0-28Dys, Female March 2020] INT;
 	ALTER TABLE Malaria2020	ALTER COLUMN [105-EP01b. Malaria Total 0-28Dys, Female April 2020] INT;
