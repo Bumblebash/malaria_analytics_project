@@ -5,7 +5,7 @@ DECLARE @cols NVARCHAR(MAX);
 -- Build dynamic column list
 SELECT @cols = STRING_AGG(CAST(QUOTENAME(COLUMN_NAME) AS NVARCHAR(MAX)), ',')
 FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = 'Malaria2020'
+WHERE TABLE_NAME = 'Malaria2023'
   AND (
        COLUMN_NAME LIKE '105-EP01c%'  -- Confirmed Cases
        OR COLUMN_NAME LIKE '105-EP01d%'  -- Treated Cases
@@ -21,7 +21,7 @@ WITH Unpivoted AS (
         Population,
         ColName,
         Value
-    FROM Malaria2020
+    FROM Malaria2023
     UNPIVOT (
         Value FOR ColName IN (' + @cols + ')
     ) u
@@ -104,3 +104,15 @@ GROUP BY
 EXEC sp_executesql @sql;
 
 SELECT * from Stg_Malaria;
+SELECT * FROM Stg_Malaria 
+WHERE Region = District;
+
+SELECT DISTINCT(Year) FROM Stg_Malaria;
+
+DROP TABLE Malaria2023;
+
+
+SELECT * FROM Malaria2023;
+
+
+SELECT [105-EP01c. Malaria Confirmed (B/s and RDT Positive) 10-19Yrs, Female August 2021] FROM Malaria2021;
