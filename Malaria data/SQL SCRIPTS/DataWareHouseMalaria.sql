@@ -206,6 +206,8 @@ FROM Practice1.dbo.malaria_data1;
 
 SELECT * FROM malaria_data1;
 
+=====================================================================================================================
+
 
 --CREATING A STAGING LAYER
 CREATE TABLE Stg_Malaria(
@@ -222,18 +224,6 @@ CREATE TABLE Stg_Malaria(
 
 );
 
---LOADIG DATA INTO THE STAGING LAYER
-INSERT INTO Stg_Malaria (Region, District, Year, ConfirmedCases, TreatedCases, Population) 
-SELECT 
-	Region,
-	District,
-	Year,
-	[TotalCasesConfirmed_BSRDT] As ConfirmedCases,
-	[TOTAL_CASES_TREATED] AS TreatedCases,
-	TotalPopulation AS Population
-FROM malaria_data1;
-
-SELECT * FROM Stg_Malaria;
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -254,6 +244,7 @@ INSERT INTO Dimdate
 FROM Stg_Malaria;
 
 
+======================================================================================================================================
 
 
 --LOAD DimensionRegion
@@ -264,7 +255,7 @@ INSERT INTO DimRegion
 --Confirming Dimension table information for Regions
 SELECT * FROM DimRegion;
 
-
+=======================================================================================================================================
 --LOAD District Dimension
 INSERT INTO DimDistrict(DistrictName, RegionKey)
 		SELECT DISTINCT
@@ -288,7 +279,7 @@ SELECT * FROM DimDistrict;
 INSERT INTO DimAgeGroup 
 SELECT DISTINCT 
 
-
+===========================================================================================================================================
 --LOAD FACT TABLE
 INSERT INTO FactMalaria
 (
