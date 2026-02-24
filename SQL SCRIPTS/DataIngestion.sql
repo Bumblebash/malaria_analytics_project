@@ -1,8 +1,11 @@
 USE Malaria_DB;
 
---23/02/2026
 
-EXEC sp_help DimDate;
+
+----Enriching the Popualation columns for North Central and South Central
+UPDATE Stg_Malaria 
+SET Population = '1428775'
+WHERE Year = '2024' AND Region = 'North Central' AND Region = District;
 
 
 ======================================================================================================-
@@ -30,12 +33,12 @@ WHERE Region NOT IN (SELECT Region FROM DimRegion);
 SELECT *FROM DimRegion;
 
 
-==============================================================================================================
+=====================================================================================================================================================
 
 ---LOAD IN DISTRICT
 SELECT * FROM DimDistrict;
 
-======================================================================
+==================================================================================================================================================
 --LOAD INTO AgeGroup
 SELECT * FROM DimAgeGroup;
 
@@ -60,3 +63,69 @@ FROM Stg_Malaria
 WHERE AgeGroup IS NOT NULL;
 
 SELECT * FROM DimAgeGroup;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+--24/02/2026
+--LOAD INTO DIMGENDER
+
+INSERT INTO DimGender (Gender)
+SELECT DISTINCT Gender
+FROM Stg_Malaria ;
+ ---Confirm Data in DimGender
+ SELECT * FROM DimGender;
+
+ ----------------------------------------------------------------------------------------------------------------------------------------------------
+ -----CHECKING OUT DATA INSIDE Dimensions and Facts
+SELECT * FROM DimDistrict
+SELECT * FROM DimDate
+SELECT * FROM DimGender
+SELECT * FROM DimAgeGroup
+SELECT * FROM DimRegion
+SELECT * FROM FactMalaria;
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+-----LOADING DATA INTO FACT TABLE
+INSERT INTO FactMalaria
+(
+DateKey,
+DistrictKey,
+RegionKey,
+AgeKey,
+GenderKey,
+ConfirmedCases,
+TreatedCases,
+Population
+)
+SELECT
+     d.DateKey,
+     dist.DistrictKey,
+     reg.RegionKey,
+     age.AgeKey,
+     gen.GenderKey,
+
+
+     SUM(m.ConfirmedCases),
+     SUM(m.TreatedCases),
+     m.Population
+FROM Stg_Malaria m
+
+JOIN DimDate d ON m.Year = d.Year
+JOIN DimDistrict dist ON m.District = dist.DistrictName
+JOIN DimRegion reg ON dist.RegionKey = reg.RegionKey
+JOIN DimAgeGroup age ON m.AgeGroup = age.AgeGroup
+JOIN DimGender gen ON m.Gender = gen.Gender
+
+
+GROUP BY 
+        d.DateKey,
+        dist.DistrictKey,
+        reg.RegionKey,
+        age.AgeKey,
+        gen.GenderKey,
+        m.Population;
+     
+
+SELECT * FROM  FactMalaria;
+
+ 
