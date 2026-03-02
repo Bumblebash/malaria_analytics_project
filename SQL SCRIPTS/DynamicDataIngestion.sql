@@ -1,5 +1,7 @@
 USE Malaria_DB;
 
+---DATA INGESTION INTO STAGING LAYER
+
 DECLARE @cols NVARCHAR(MAX);
 
 -- Build dynamic column list
@@ -103,22 +105,8 @@ GROUP BY
 
 EXEC sp_executesql @sql;
 
-SELECT * from Stg_Malaria;
-SELECT * FROM Stg_Malaria 
-WHERE Region = District;
 
-SELECT DISTINCT(Year) FROM Stg_Malaria;
-
-DROP TABLE Malaria2023;
-
-
-SELECT * FROM Malaria2023;
-
-
-SELECT [105-EP01c. Malaria Confirmed (B/s and RDT Positive) 10-19Yrs, Female August 2021] FROM Malaria2021;
-
-
-
+--Confirming Number of Columns in Staging Malaria2023 CSV
 SELECT 
       COUNT(*) AS NumberOfColumns 
 FROM 

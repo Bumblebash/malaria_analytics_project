@@ -83,6 +83,7 @@ SELECT * FROM DimAgeGroup
 SELECT * FROM DimRegion
 SELECT * FROM FactMalaria;
 
+
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 -----LOADING DATA INTO FACT TABLE
@@ -126,6 +127,11 @@ GROUP BY
         m.Population;
      
 
-SELECT * FROM  FactMalaria;
+SELECT r.Region,d.DistrictName, SUM(f.ConfirmedCases) AS total_Cases, SUM(f.TreatedCases) As total_treted , y.Year FROM FactMalaria f
+LEFT JOIN DimRegion r ON  f.RegionKey = r.RegionKey
+LEFT JOIN DimDistrict d ON f.DistrictKey = d.DistrictKey 
+JOIN DimDate y ON f.DateKey = y.DateKey
+WHERE r.Region = d.DistrictName AND y.Year = 2021
+GROUP BY r.Region, d.DistrictName, y.Year;
 
- 
+ SELECT * FROM FactMalaria;
