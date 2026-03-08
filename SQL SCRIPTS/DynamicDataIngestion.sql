@@ -7,7 +7,7 @@ DECLARE @cols NVARCHAR(MAX);
 -- Build dynamic column list
 SELECT @cols = STRING_AGG(CAST(QUOTENAME(COLUMN_NAME) AS NVARCHAR(MAX)), ',')
 FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = 'Malaria2023'
+WHERE TABLE_NAME = 'vw_MalariaRaw'
   AND (
        COLUMN_NAME LIKE '105-EP01c%'  -- Confirmed Cases
        OR COLUMN_NAME LIKE '105-EP01d%'  -- Treated Cases
@@ -114,3 +114,12 @@ FROM
 WHERE 
      TABLE_NAME = 'Malaria2023'
      AND TABLE_SCHEMA = 'dbo';
+
+
+
+
+     SELECT  * FROM Stg_Malaria;
+     
+
+     SELECT COUNT(*) FROM Stg_Malaria;
+     SELECT COUNT(*) FROM FactMalaria;

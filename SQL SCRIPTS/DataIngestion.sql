@@ -35,8 +35,6 @@ SELECT *FROM DimRegion;
 
 =====================================================================================================================================================
 
----LOAD IN DISTRICT
-SELECT * FROM DimDistrict;
 
 ==================================================================================================================================================
 --LOAD INTO AgeGroup
@@ -101,37 +99,71 @@ Population
 SELECT
      d.DateKey,
      dist.DistrictKey,
-     reg.RegionKey,
+     dist.RegionKey,
      age.AgeKey,
      gen.GenderKey,
-
-
-     SUM(m.ConfirmedCases),
-     SUM(m.TreatedCases),
+     m.ConfirmedCases,
+     m.TreatedCases,
      m.Population
 FROM Stg_Malaria m
 
-JOIN DimDate d ON m.Year = d.Year
+JOIN DimDate d ON m.Year = d.Year AND d.Month = m.Month
 JOIN DimDistrict dist ON m.District = dist.DistrictName
-JOIN DimRegion reg ON dist.RegionKey = reg.RegionKey
 JOIN DimAgeGroup age ON m.AgeGroup = age.AgeGroup
 JOIN DimGender gen ON m.Gender = gen.Gender
-
-
-GROUP BY 
-        d.DateKey,
-        dist.DistrictKey,
-        reg.RegionKey,
-        age.AgeKey,
-        gen.GenderKey,
-        m.Population;
-     
+;
+TRUNCATE TABLE FactMalaria;
+SELECT * FROM FactMalaria;
 
 SELECT r.Region,d.DistrictName, SUM(f.ConfirmedCases) AS total_Cases, SUM(f.TreatedCases) As total_treted , y.Year FROM FactMalaria f
 LEFT JOIN DimRegion r ON  f.RegionKey = r.RegionKey
 LEFT JOIN DimDistrict d ON f.DistrictKey = d.DistrictKey 
 JOIN DimDate y ON f.DateKey = y.DateKey
-WHERE r.Region = d.DistrictName AND y.Year = 2021
+WHERE y.Year = 2022  
 GROUP BY r.Region, d.DistrictName, y.Year;
 
+SELECT r.Region, SUM(f.ConfirmedCases) AS total_Cases, SUM(f.TreatedCases) As total_treted , y.Year FROM FactMalaria f
+LEFT JOIN DimRegion r ON  f.RegionKey = r.RegionKey
+JOIN DimDate y ON f.DateKey = y.DateKey
+WHERE y.Year = 2023 
+GROUP BY r.Region,y.Year;
+
+
+
+SELECT * FROM Stg_Malaria;
+
+SELECT Region, District, SUM(ConfirmedCases) AS TotalCases, SUM(TreatedCases) AS TreatedCases FROM Stg_Malaria
+WHERE Region = District AND Year = 2023
+GROUP BY Region, District;
+
  SELECT * FROM FactMalaria;
+
+ SELECT COUNT(*)
+ FROM FactMalaria;
+
+ SELECT 
+    r.Region,
+    d.DistrictName,
+    SUM(f.ConfirmedCases) AS total_Cases,
+    SUM(f.TreatedCases) AS total_treated,
+    y.Year
+FROM FactMalaria f
+
+
+
+    SELECT SUM(ConfirmedCases) As Total_Cases FROM FactMalaria 
+    WHERE RegionKey = 2 AND DateKey LIKE '%2023%'
+    ;
+    SELECT   GenderKey,Districtkey,RegionKey, ConfirmedCases, DateKey FROM FactMalaria
+    WHERE RegionKey = 2 AND DateKey like '%2023%';
+  
+
+    SELECT * FROM Stg_Malaria;
+    SELECT * FROM DimDistrict;
+    SELECT * FROM FactMalaria;
+    SELECT * FROM DimRegion;
+
+    SELECT * FROM FactMalaria WHERE RegionKey = 2;
+
+
+    SELECT * FROM Malaria2020;

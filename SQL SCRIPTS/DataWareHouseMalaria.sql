@@ -171,7 +171,6 @@ CREATE TABLE DataQualityChecks(
 CREATE NONCLUSTERED INDEX IX_Fact_Date
 ON FactMalaria(DateKey);
 
-
 CREATE NONCLUSTERED INDEX IX_Fact_District
 ON FactMalaria(DistrictKey);
 
@@ -206,7 +205,7 @@ FROM Practice1.dbo.malaria_data1;
 
 SELECT * FROM malaria_data1;
 
-=====================================================================================================================
+====================================================================================================================================================================================
 
 
 --CREATING A STAGING LAYER
@@ -224,6 +223,30 @@ CREATE TABLE Stg_Malaria(
 
 );
 
+
+--06/03/2026
+--INCLUDING PRIMARY KEY TO STAGING TABLE TO PREVENT ADDTION OF DUPLICATES
+--Change the datatypes of the Grains to only include Null values
+ALTER TABLE Stg_Malaria  ALTER COLUMN Region  VARCHAR(100) NOT NULL;
+ALTER TABLE Stg_Malaria ALTER COLUMN District VARCHAR(100) NOT NULL;
+ALTER TABLE Stg_Malaria ALTER COLUMN Year INT NOT NULL;
+ALTER TABLE Stg_Malaria ALTER COLUMN Month INT NOT NULL;
+ALTER TABLE Stg_Malaria ALTER COLUMN AgeGroup VARCHAR(50) NOT NULL;
+ALTER TABLE Stg_Malaria ALTER COLUMN Gender  VARCHAR(10) NOT NULL;
+
+--Enforcing Primary Key to prevent Future Duplicates
+ALTER TABLE Stg_Malaria
+ADD CONSTRAINT PK_StgMalaria
+PRIMARY KEY(
+Region,
+District,
+Year,
+Month,
+AgeGroup,
+Gender
+);
+
+SELECT * FROM Stg_Malaria;
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -260,26 +283,84 @@ SELECT * FROM DimRegion;
 INSERT INTO DimDistrict(DistrictName, RegionKey)
 		SELECT DISTINCT
 		s.District,
-		r.RegionKey
+		r.RegionKey,
+		CASE 
+		    WHEN s.District LIKE '%City%' THEN 1
+			ELSE 0
+		END IsCity
 FROM Stg_Malaria s
 JOIN DimRegion r
      ON s.Region = r.Region
 WHERE NOT EXISTS (
 	SELECT 1 FROM DimDistrict d 
 	WHERE d.Districtname = s.District
-);
+) AND 
+    ;
 
 --Confirm data Inside the dimension table
 SELECT * FROM DimDistrict;
 
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----02/03/2026
+--Updating the DimDistrict Dimension so that we can only accomodate valid districts and Cities
+ 
+/**Step 1: (Realise the present Foreign Keys in the table and the corresponding Referencing Table) **/ 
+Exec sp_fkeys 'DimDistrict';
+
+/**Step 1(Drop the Foreign Key Constraint from Referencing table) **/
+ALTER TABLE FactMalaria DROP CONSTRAINT FK_Fact_District;
+ALTER TABLE FactSpatialStats DROP CONSTRAINT FK_Spatial_District;
+
+/**Step 2: Truncate table to drop old data **/
+TRUNCATE TABLE DimDistrict;
+
+/**Step 3: Ingest data using New Logic **/
+INSERT INTO DimDistrict (DistrictName, RegionKey, IsCity)
+SELECT DISTINCT
+        s.District,
+		r.RegionKey,
+		CASE 
+			WHEN s.District LIKE '%City%' THEN 1
+			ELSE 0
+		END AS IsCity
+FROM Stg_Malaria s 
+JOIN DimRegion r ON s.Region = r.Region
+WHERE s.District LIKE '%District%'
+      OR s.District LIKE '%City%'
+	  AND s.Region <> s.District;
+
+/**Step 4: Recreate Back the Foreign Keys **/
+--1) Foreign Key From FactMalaria 
+ALTER TABLE FactMalaria ADD   CONSTRAINT FK_Fact_District
+		FOREIGN KEY (DistrictKey)
+		REFERENCES DimDistrict(DistrictKey);
+
+---2) Foreign Key From SpatialStat
+ALTER TABLE FactSpatialStats ADD CONSTRAINT FK_Spatial_District
+             FOREIGN KEY (DistrictKey)
+			 REFERENCES DimDistrict(DistrictKey);
+
+/**Checking for duplicates in DimDimsnsion **/
+SELECT * FROM DimDistrict;
+SELECT * FROM DimRegion;
+SELECT DistrictName,
+COUNT(*) as Occurances
+FROM  DimDistrict
+GROUP BY 
+DistrictName 
+HAVING COUNT(*) > 1;
+
+SELECT * FROM FactMalaria;
 
 
---LOAD AGE GROUPS (We dont have 
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--LOAD AGE GROUPS 
 INSERT INTO DimAgeGroup 
 SELECT DISTINCT 
 
-===========================================================================================================================================
+==============================================================================================================================================================================================
 --LOAD FACT TABLE
 INSERT INTO FactMalaria
 (
