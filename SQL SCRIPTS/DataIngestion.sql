@@ -4,6 +4,7 @@ USE Malaria_DB;
 
 ----Enriching the Popualation columns for North Central and South Central
 UPDATE Stg_Malaria 
+
 SET Population = '1428775'
 WHERE Year = '2024' AND Region = 'North Central' AND Region = District;
 
@@ -112,7 +113,7 @@ JOIN DimDistrict dist ON m.District = dist.DistrictName
 JOIN DimAgeGroup age ON m.AgeGroup = age.AgeGroup
 JOIN DimGender gen ON m.Gender = gen.Gender
 ;
-TRUNCATE TABLE FactMalaria;
+
 SELECT * FROM FactMalaria;
 
 SELECT r.Region,d.DistrictName, SUM(f.ConfirmedCases) AS total_Cases, SUM(f.TreatedCases) As total_treted , y.Year FROM FactMalaria f
@@ -167,3 +168,8 @@ FROM FactMalaria f
 
 
     SELECT * FROM Malaria2020;
+
+
+
+
+   EXEC sp_help Stg_Malaria;
