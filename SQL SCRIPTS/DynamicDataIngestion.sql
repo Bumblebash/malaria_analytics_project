@@ -123,3 +123,13 @@ WHERE
 
      SELECT COUNT(*) FROM Stg_Malaria;
      SELECT COUNT(*) FROM FactMalaria;
+
+
+
+
+     SELECT COUNT(*) AS NumberColumns
+     FROM 
+      INFORMATION_SCHEMA.COLUMNS 
+      WHERE 
+      TABLE_NAME = 'Malaria2024'
+      AND  TABLE_SCHEMA = 'dbo';
