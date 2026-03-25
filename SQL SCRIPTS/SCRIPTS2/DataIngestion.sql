@@ -1,16 +1,15 @@
-USE Malaria_DB;
 
----DATA INGESTION INTO STAGING LAYER
-
+USE Malaria_DB1;
 DECLARE @cols NVARCHAR(MAX);
 
--- Build dynamic column list
+-- Build dynamic column list from source table
 SELECT @cols = STRING_AGG(CAST(QUOTENAME(COLUMN_NAME) AS NVARCHAR(MAX)), ',')
 FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = 'vw_MalariaRaw'
+WHERE TABLE_NAME = 'Malaria2024'
   AND (
-       COLUMN_NAME LIKE '105-EP01c%'  -- Confirmed Cases
-       OR COLUMN_NAME LIKE '105-EP01d%'  -- Treated Cases
+       COLUMN_NAME LIKE '105-EP01c%'   -- Confirmed Cases
+       OR COLUMN_NAME LIKE '105-EP01d%' -- Treated Cases
+       OR COLUMN_NAME LIKE '105-MC04%'  -- Malaria in pregnancy
       );
 
 DECLARE @sql NVARCHAR(MAX);
@@ -23,7 +22,7 @@ WITH Unpivoted AS (
         Population,
         ColName,
         Value
-    FROM vw_MalariaRaw
+    FROM Malaria2024
     UNPIVOT (
         Value FOR ColName IN (' + @cols + ')
     ) u
@@ -53,6 +52,7 @@ Parsed AS (
         CASE 
             WHEN ColName LIKE ''105-EP01c%'' THEN ''ConfirmedCases''
             WHEN ColName LIKE ''105-EP01d%'' THEN ''TreatedCases''
+            WHEN ColName LIKE ''105-MC04%''  THEN ''PregnancyCases''
         END AS CaseType,
 
         CASE
@@ -71,7 +71,7 @@ Parsed AS (
         Value
     FROM Unpivoted
 )
-INSERT INTO Stg_Malaria (
+INSERT INTO Stg_Malaria_Permanent(
     Region,
     District,
     Year,
@@ -80,6 +80,7 @@ INSERT INTO Stg_Malaria (
     Gender,
     ConfirmedCases,
     TreatedCases,
+    PregnancyCases,
     Population
 )
 SELECT 
@@ -91,6 +92,7 @@ SELECT
      Gender,
      SUM(CASE WHEN CaseType = ''ConfirmedCases'' THEN Value ELSE 0 END) AS ConfirmedCases,
      SUM(CASE WHEN CaseType = ''TreatedCases'' THEN Value ELSE 0 END) AS TreatedCases,
+     SUM(CASE WHEN CaseType = ''PregnancyCases'' THEN Value ELSE 0 END) AS PregnancyCases,
      Population
 FROM Parsed
 GROUP BY 
@@ -101,69 +103,16 @@ GROUP BY
        AgeGroup,
        Gender,
        Population;
-';
+'
 
 EXEC sp_executesql @sql;
 
 
---Confirming Number of Columns in Staging Malaria2023 CSV
-SELECT 
-      COUNT(*) AS NumberOfColumns 
-FROM 
-    INFORMATION_SCHEMA.COLUMNS 
-WHERE 
-     TABLE_NAME = 'Malaria2023'
-     AND TABLE_SCHEMA = 'dbo';
+
+
+SELECT COUNT(*) As Records  FROM Stg_Malaria_Permanent;
+
+SELECT * FROM Stg_Malaria_Permanent;
 
 
 
-
-     SELECT  * FROM Stg_Malaria;
-     
-
-     SELECT COUNT(*) FROM Stg_Malaria;
-     SELECT COUNT(*) FROM FactMalaria;
-
-
-
-
-     SELECT COUNT(*) AS NumberColumns
-     FROM 
-      INFORMATION_SCHEMA.COLUMNS 
-      WHERE 
-      TABLE_NAME = 'Malaria2024'
-      AND  TABLE_SCHEMA = 'dbo';
-
-      EXEC sp_help Stg_Malaria;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      CREATE VIEW vw_MalariaRaw AS
-
-SELECT * FROM Malaria2020
-UNION ALL
-SELECT * FROM Malaria2021
-UNION ALL
-SELECT * FROM Malaria2022
-UNION ALL
-SELECT * FROM Malaria2023
-UNION ALL
-SELECT * FROM Malaria2024;

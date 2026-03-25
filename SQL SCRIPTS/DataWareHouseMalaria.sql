@@ -226,7 +226,7 @@ CREATE TABLE Stg_Malaria(
 
 --06/03/2026
 --INCLUDING PRIMARY KEY TO STAGING TABLE TO PREVENT ADDTION OF DUPLICATES
---Change the datatypes of the Grains to only include Null values
+--Change the datatypes of the Grains to only include Not Null values
 ALTER TABLE Stg_Malaria  ALTER COLUMN Region  VARCHAR(100) NOT NULL;
 ALTER TABLE Stg_Malaria ALTER COLUMN District VARCHAR(100) NOT NULL;
 ALTER TABLE Stg_Malaria ALTER COLUMN Year INT NOT NULL;
@@ -245,6 +245,7 @@ Month,
 AgeGroup,
 Gender
 );
+GO
 
 SELECT * FROM Stg_Malaria;
 
@@ -400,3 +401,6 @@ JOIN DimGender g
 ON g.Gender = s.Gender;
 
 
+
+
+SELECT * FROM ETL_loadlog;
