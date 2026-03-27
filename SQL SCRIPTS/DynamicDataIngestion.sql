@@ -4,13 +4,14 @@ USE Malaria_DB;
 
 DECLARE @cols NVARCHAR(MAX);
 
--- Build dynamic column list
+-- Build dynamic column list from source table
 SELECT @cols = STRING_AGG(CAST(QUOTENAME(COLUMN_NAME) AS NVARCHAR(MAX)), ',')
 FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = 'vw_MalariaRaw'
+WHERE TABLE_NAME = 'Malaria2024'
   AND (
-       COLUMN_NAME LIKE '105-EP01c%'  -- Confirmed Cases
-       OR COLUMN_NAME LIKE '105-EP01d%'  -- Treated Cases
+       COLUMN_NAME LIKE '105-EP01c%'   -- Confirmed Cases
+       OR COLUMN_NAME LIKE '105-EP01d%' -- Treated Cases
+       OR COLUMN_NAME LIKE '105-MC04%'  -- Malaria in pregnancy
       );
 
 DECLARE @sql NVARCHAR(MAX);
@@ -23,7 +24,7 @@ WITH Unpivoted AS (
         Population,
         ColName,
         Value
-    FROM vw_MalariaRaw
+    FROM Malaria2024
     UNPIVOT (
         Value FOR ColName IN (' + @cols + ')
     ) u
@@ -53,6 +54,7 @@ Parsed AS (
         CASE 
             WHEN ColName LIKE ''105-EP01c%'' THEN ''ConfirmedCases''
             WHEN ColName LIKE ''105-EP01d%'' THEN ''TreatedCases''
+            WHEN ColName LIKE ''105-MC04%''  THEN ''PregnancyCases''
         END AS CaseType,
 
         CASE
@@ -71,7 +73,7 @@ Parsed AS (
         Value
     FROM Unpivoted
 )
-INSERT INTO Stg_Malaria (
+INSERT INTO Stg_Malaria(
     Region,
     District,
     Year,
@@ -80,6 +82,7 @@ INSERT INTO Stg_Malaria (
     Gender,
     ConfirmedCases,
     TreatedCases,
+    PregnancyCases,
     Population
 )
 SELECT 
@@ -91,6 +94,7 @@ SELECT
      Gender,
      SUM(CASE WHEN CaseType = ''ConfirmedCases'' THEN Value ELSE 0 END) AS ConfirmedCases,
      SUM(CASE WHEN CaseType = ''TreatedCases'' THEN Value ELSE 0 END) AS TreatedCases,
+     SUM(CASE WHEN CaseType = ''PregnancyCases'' THEN Value ELSE 0 END) AS PregnancyCases,
      Population
 FROM Parsed
 GROUP BY 
@@ -101,7 +105,7 @@ GROUP BY
        AgeGroup,
        Gender,
        Population;
-';
+'
 
 EXEC sp_executesql @sql;
 
@@ -116,7 +120,7 @@ WHERE
      AND TABLE_SCHEMA = 'dbo';
 
 
-
+     TRUNCATE TABLE Stg_Malaria;
 
      SELECT  * FROM Stg_Malaria;
      
@@ -137,6 +141,20 @@ WHERE
       EXEC sp_help Stg_Malaria;
 
 
+      TRUNCATE TABLE Stg_Malaria;
+
+DROP TABLE Malaria2020
+DROP TABLE Malaria2021
+DROP TABLE Malaria2022
+DROP TABLE Malaria2023
+DROP TABLE Malaria2024
+
+
+SELECT * FROM Stg_Malaria;
+
+
+
+ALTER TABLE Stg_Malaria ADD  PregnancyCases INT;
 
 
 
@@ -146,13 +164,8 @@ WHERE
 
 
 
-
-
-
-
-
-
-
+SELECT * FROM Malaria2024;
+DROP TABLE Malaria2020;
 
 
 
@@ -167,3 +180,47 @@ UNION ALL
 SELECT * FROM Malaria2023
 UNION ALL
 SELECT * FROM Malaria2024;
+
+
+
+
+
+
+
+SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2020'
+       AND TABLE_SCHEMA = 'dbo';
+
+       SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2021'
+       AND TABLE_SCHEMA = 'dbo';
+
+
+       SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2022'
+       AND TABLE_SCHEMA = 'dbo';
+
+
+       SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2023'
+       AND TABLE_SCHEMA = 'dbo';
+
+
+       SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2024'
+       AND TABLE_SCHEMA = 'dbo';

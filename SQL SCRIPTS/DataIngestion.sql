@@ -9,7 +9,7 @@ SET Population = '1428775'
 WHERE Year = '2024' AND Region = 'North Central' AND Region = District;
 
 
-======================================================================================================-
+===========================================================================================================
 --INGEST DateDimension data into Dimdate
 INSERT INTO DimDate
 SELECT DISTINCT

@@ -110,9 +110,47 @@ EXEC sp_executesql @sql;
 
 
 
+
 SELECT COUNT(*) As Records  FROM Stg_Malaria_Permanent;
 
 SELECT * FROM Stg_Malaria_Permanent;
 
 
 
+SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2020'
+       AND TABLE_SCHEMA = 'dbo';
+
+       SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2021'
+       AND TABLE_SCHEMA = 'dbo';
+
+
+       SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2022'
+       AND TABLE_SCHEMA = 'dbo';
+
+
+       SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2023'
+       AND TABLE_SCHEMA = 'dbo';
+
+
+       SELECT COUNT(*) AS NumberofColumns
+FROM
+  INFORMATION_SCHEMA.COLUMNS
+  WHERE 
+       TABLE_NAME = 'Malaria2024'
+       AND TABLE_SCHEMA = 'dbo';
