@@ -223,6 +223,9 @@ CREATE TABLE Stg_Malaria(
 
 );
 
+ALTER TABLE Stg_Malaria ADD TotalRecordedCases INT;
+EXEC sp_rename 'Stg_Malaria.TotalRecordedCases', 'TotalCasesRecorded', 'COLUMN';
+
 
 --06/03/2026
 --INCLUDING PRIMARY KEY TO STAGING TABLE TO PREVENT ADDTION OF DUPLICATES

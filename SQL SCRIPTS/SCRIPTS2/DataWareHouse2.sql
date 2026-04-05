@@ -34,20 +34,9 @@ CREATE INDEX IX_Stg_Grains ON Stg_Malaria_Permanent(Region, District, Year, Mont
 GO 
 
 
-DROP TABLE Stg_Malaria_Permanent;
-SELECT * FROM Stg_Malaria_Permanent;
+---Altering the Permanent Staging to include TotalCases Recorded(Confirmed and Unconfirmed)
+ALTER TABLE Stg_Malaria_Permanent ADD  TotalCasesRecorded INT;
 
 
 
-TRUNCATE TABLE Stg_Malaria_Permanent;
 
-
-DROP TABLE Malaria2020
-DROP TABLE Malaria2021
-DROP TABLE Malaria2022
-DROP TABLE Malaria2023
-DROP TABLE Malaria2024
-
-SELECT * FROM Stg_Malaria_Permanent;
-
-SELECT * FROM Malaria2024;
