@@ -68,7 +68,7 @@ DECLARE @sql NVARCHAR(MAX);
 
                 CASE 
                     WHEN ColName LIKE ''%Female%'' THEN ''Female''
-                    WHEN ColName LIKE ''%Male%'' THEN ''Male''
+                    WHEN ColName LIKE ''% Male%'' THEN ''Male''
                 END AS Gender,
 
                 Value

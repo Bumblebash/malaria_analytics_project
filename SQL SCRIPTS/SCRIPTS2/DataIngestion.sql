@@ -70,7 +70,7 @@ DECLARE @sql NVARCHAR(MAX);
 
                 CASE 
                     WHEN ColName LIKE ''%Female%'' THEN ''Female''
-                    WHEN ColName LIKE ''%Male%'' THEN ''Male''
+                    WHEN ColName LIKE ''% Male%'' THEN ''Male''
                 END AS Gender,
 
                 Value
@@ -124,6 +124,8 @@ SELECT COUNT(*) As Records  FROM Stg_Malaria_Permanent;
 
 SELECT * FROM Stg_Malaria_Permanent;
 
+TRUNCATE TABLE Stg_Malaria_Permanent;
+
 
 
 SELECT COUNT(*) AS NumberofColumns
@@ -163,3 +165,6 @@ FROM
   WHERE 
        TABLE_NAME = 'Malaria2024'
        AND TABLE_SCHEMA = 'dbo';
+
+SELECT * FROM Stg_Malaria_Permanent;
+TRUNCATE TABLE Stg_Malaria_Permanent;
