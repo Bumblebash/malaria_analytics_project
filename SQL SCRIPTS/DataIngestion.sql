@@ -10,7 +10,7 @@ WHERE Year = '2024' AND Region = 'North Central' AND Region = District;
 
 
 ===========================================================================================================
---INGEST DateDimension data into Dimdate
+------INGEST DateDimension data into Dimdate
 INSERT INTO DimDate
 SELECT DISTINCT
        Year*10000 + Month*100 + 1 AS DateKey,

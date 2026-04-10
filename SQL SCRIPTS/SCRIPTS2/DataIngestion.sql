@@ -120,6 +120,7 @@ GO
 
 
 
+
 SELECT COUNT(*) As Records  FROM Stg_Malaria_Permanent;
 
 SELECT * FROM Stg_Malaria_Permanent;
@@ -167,4 +168,3 @@ FROM
        AND TABLE_SCHEMA = 'dbo';
 
 SELECT * FROM Stg_Malaria_Permanent;
-TRUNCATE TABLE Stg_Malaria_Permanent;
