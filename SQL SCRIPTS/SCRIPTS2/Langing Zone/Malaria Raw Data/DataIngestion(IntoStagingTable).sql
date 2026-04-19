@@ -1,5 +1,5 @@
 
-USE Malaria_DB1;
+USE MalariaLanding_DB;
 
 
 ---DATA INGESTION INTO THE PERMANENT STAGING TABLE
@@ -23,7 +23,6 @@ DECLARE @sql NVARCHAR(MAX);
             SELECT
                 orgunitlevel2 AS Region,
                 organisationunitname AS District,
-                Population,
                 ColName,
                 Value
             FROM Malaria2024
@@ -35,7 +34,6 @@ DECLARE @sql NVARCHAR(MAX);
             SELECT 
                 Region, 
                 District,
-                Population,
                 CAST(RIGHT(ColName,4) AS INT) AS Year,
 
                 CASE
@@ -86,8 +84,7 @@ DECLARE @sql NVARCHAR(MAX);
             ConfirmedCases,
             TreatedCases,
             PregnancyCases,
-            TotalCasesRecorded,
-            Population
+            TotalCasesRecorded
         )
         SELECT 
              Region,
@@ -99,8 +96,7 @@ DECLARE @sql NVARCHAR(MAX);
              SUM(CASE WHEN CaseType = ''ConfirmedCases'' THEN Value ELSE 0 END) AS ConfirmedCases,
              SUM(CASE WHEN CaseType = ''TreatedCases'' THEN Value ELSE 0 END) AS TreatedCases,
              SUM(CASE WHEN CaseType = ''PregnancyCases'' THEN Value ELSE 0 END) AS PregnancyCases,
-             SUM(CASE WHEN CaseType = ''TotalCasesRecorded'' THEN Value ELSE 0 END) AS TotalCasesRecorded,
-             Population
+             SUM(CASE WHEN CaseType = ''TotalCasesRecorded'' THEN Value ELSE 0 END) AS TotalCasesRecorded
         FROM Parsed
         GROUP BY 
                Region,
@@ -108,8 +104,7 @@ DECLARE @sql NVARCHAR(MAX);
                Year, 
                Month,
                AgeGroup,
-               Gender,
-               Population;
+               Gender
         '
 
 EXEC sp_executesql @sql
