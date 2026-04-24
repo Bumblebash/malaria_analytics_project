@@ -1,20 +1,24 @@
 USE MalariaLanding_DB;
 
-INSERT INTO Stg_Malaria_Permanent(
-     Population_2020,
-     Population_2021,
-     Popualation_2022,
-     Popaulation_2023,
-     Population_2024
+WITH rate AS(
+SELECT
+Region,
+District,
+population_2014,
+population_2024,
+((LOG(population_2024) - LOG(population_2014)) / 10) As rate
+FROM UBOS_population_data
+),
+Estimated_population AS (
+SELECT 
+Region,
+District,
+rate,
+(population_2014 * EXP(rate*6)) AS est_2020,
+(population_2014 * EXP(rate*7)) AS est_2021,
+(population_2014 * EXP(rate*8)) AS est_2022,
+(population_2014 * EXP(rate*9)) AS est_2023,
+population_2024
+FROM rate
 )
-SELECT(
-)
-
-WITH Growth_Rate AS (
-    SELECT 
-         District,
-         Region,
-
-
-
-)
+SELECT * FROM Estimated_population;
