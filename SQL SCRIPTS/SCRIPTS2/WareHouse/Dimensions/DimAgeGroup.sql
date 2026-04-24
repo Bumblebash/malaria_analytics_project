@@ -1,0 +1,11 @@
+USE MalariaWareHouse_DB;
+
+--CREATING AgeGroup Dimension
+CREATE TABLE DimAgeGroup(
+    AgeKey INT IDENTITY(1,1) PRIMARY KEY,
+    AgeGroup NVARCHAR(50) NOT NULL UNIQUE,
+    MinAge NVARCHAR NOT NULL,
+    MaxAge NVARCHAR NOT NULL
+);
+GO
+

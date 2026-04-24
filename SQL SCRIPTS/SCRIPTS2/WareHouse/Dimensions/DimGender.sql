@@ -1,0 +1,8 @@
+USE MalariaWareHouse_DB;
+
+---GENDER DIMENSION(DimGender)
+CREATE TABLE GenderDim(
+GenderKey INT PRIMARY KEY,
+Gender VARCHAR(10) NOT NULL UNIQUE
+);
+GO 

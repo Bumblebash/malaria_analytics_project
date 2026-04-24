@@ -57,7 +57,7 @@ CREATE TABLE DimAgeGroup(
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
---GENDER DIMESNSION(DimGender)
+--GENDER DIMENSION(DimGender)
 CREATE TABLE DimGender(
     GenderKey INT IDENTITY(1,1) PRIMARY KEY,
 	Gender VARCHAR(10) NOT NULL UNIQUE 
@@ -343,7 +343,7 @@ ALTER TABLE FactSpatialStats ADD CONSTRAINT FK_Spatial_District
              FOREIGN KEY (DistrictKey)
 			 REFERENCES DimDistrict(DistrictKey);
 
-/**Checking for duplicates in DimDimsnsion **/
+/**Checking for duplicates in DimDimension **/
 SELECT * FROM DimDistrict;
 SELECT * FROM DimRegion;
 SELECT DistrictName,
