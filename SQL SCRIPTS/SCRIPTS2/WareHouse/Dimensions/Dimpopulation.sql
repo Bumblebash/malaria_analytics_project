@@ -1,6 +1,7 @@
 USE MalariaWareHouse_DB;
 
 CREATE TABLE Dimpopulation(
+PopulationKey INT IDENTITY(1,1) PRIMARY KEY,
 RegionKey INT NOT NULL,
 DistrictKey INT NOT NULL,
 population_2020 INT NULL,
@@ -20,3 +21,6 @@ CONSTRAINT FK_Population_District
            REFERENCES DimDistrict(DistrictKey)
 
 );
+DROP TABLE Dimpopulation;
+
+EXEC sp_help Dimpopulation;

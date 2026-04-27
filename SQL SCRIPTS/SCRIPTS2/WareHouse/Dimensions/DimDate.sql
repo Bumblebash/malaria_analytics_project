@@ -15,3 +15,5 @@ GO
 ---Confirming Datatypes of Columns
 EXEC sp_help DimDate
 
+
+SELECT * FROM DimDate;
