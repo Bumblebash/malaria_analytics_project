@@ -51,3 +51,6 @@ CREATE TABLE Fact_Malaria(
 
 );
 EXEC sp_help Fact_Malaria;
+
+
+SELECT * FROM Fact_Malaria;

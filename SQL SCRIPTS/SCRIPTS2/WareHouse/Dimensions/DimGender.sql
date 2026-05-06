@@ -10,4 +10,3 @@ GO
 SELECT * FROM DimGender;
 
 
-

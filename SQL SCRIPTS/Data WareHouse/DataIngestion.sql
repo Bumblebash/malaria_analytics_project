@@ -115,6 +115,7 @@ JOIN DimGender gen ON m.Gender = gen.Gender
 ;
 
 SELECT * FROM FactMalaria;
+TRUNCATE TABLE FactMalaria;
 
 SELECT r.Region,d.DistrictName, SUM(f.ConfirmedCases) AS total_Cases, SUM(f.TreatedCases) As total_treted , y.Year FROM FactMalaria f
 LEFT JOIN DimRegion r ON  f.RegionKey = r.RegionKey
@@ -129,6 +130,8 @@ JOIN DimDate y ON f.DateKey = y.DateKey
 WHERE y.Year = 2023 
 GROUP BY r.Region,y.Year;
 
+    TRUNCATE TABLE FactMalaria;
+    SELECT * FROM FactMalaria;
 
 
 SELECT * FROM Stg_Malaria;

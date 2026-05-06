@@ -40,3 +40,7 @@ ALTER TABLE Stg_Malaria_Permanent ADD  TotalCasesRecorded INT;
 
 
 
+
+
+
+
