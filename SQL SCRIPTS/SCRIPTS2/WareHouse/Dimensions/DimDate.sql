@@ -17,3 +17,20 @@ EXEC sp_help DimDate
 
 
 SELECT * FROM DimDate;
+
+
+/**Ingest Data into the Date Dimesnsion**/
+
+------INGEST DateDimension data into Dimdate
+INSERT INTO DimDate
+SELECT DISTINCT
+       Year*10000 + Month*100 + 1 AS DateKey,
+       DATEFROMPARTS(Year,Month,1),
+       Year,
+       DATEPART(QUARTER, DATEFROMPARTS(Year, Month,1)),
+       Month,
+       DATENAME(MONTH, DATEFROMPARTS(Year, Month,1)),
+       CONCAT(Year, '_', RIGHT('0' +CAST(Month AS VARCHAR), 2))
+FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent;
+
+SELECT * FROM DimDate;

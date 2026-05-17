@@ -12,3 +12,26 @@ CONSTRAINT FK_District_Region
      REFERENCES DimRegion(RegionKey)
 
 );
+
+SELECT * FROM DimDistrict;
+/**Insertion of data into the DimDistrict**/
+INSERT INTO DimDistrict (DistrictName, RegionKey, IsCity)
+SELECT DISTINCT
+        s.District,
+		r.RegionKey,
+		CASE 
+			WHEN s.District LIKE '%City%' THEN 1
+			ELSE 0
+		END AS IsCity
+FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent s 
+JOIN DimRegion r ON s.Region = r.Region
+WHERE s.District LIKE '%District%'
+      OR s.District LIKE '%City%'
+	  AND s.Region <> s.District;
+
+
+	  SELECT * FROM DimDistrict;
+
+	  SELECT COUNT(*) FROM DimDistrict WHERE DistrictName LIKE '%District%';
+
+	  SELECT * FROM DimDistrict WHERE DistrictName LIKE '%District%';

@@ -9,3 +9,34 @@ CREATE TABLE DimAgeGroup(
 );
 GO
 
+ALTER TABLE DimAgeGroup ALTER  COLUMN MaxAge INT NULL
+ALTER  TABLE DimAgeGroup ALTER COLUMN MinAge INT NULL;
+
+
+SELECT * FROM DimAgeGroup;
+
+
+/**Insert DimAgeGroup Data**/
+
+INSERT INTO DimAgeGroup (AgeGroup, MinAge, MaxAge)
+SELECT DISTINCT
+    AgeGroup,
+    CASE
+        WHEN AgeGroup = '0-28Dys' THEN 0
+        WHEN AgeGroup = '29Days-4yrs' THEN 1
+        WHEN AgeGroup = '5-9yrs' THEN 5
+        WHEN AgeGroup = '10-19yrs' THEN 10
+        WHEN AgeGroup = '20+' THEN 20
+    END AS MinAge,
+    CASE
+        WHEN AgeGroup = '0-28Dys' THEN 0
+        WHEN AgeGroup = '29Days-4yrs' THEN 4
+        WHEN AgeGroup = '5-9yrs' THEN 9
+        WHEN AgeGroup = '10-19yrs' THEN 19
+        WHEN AgeGroup = '20+' THEN NULL
+    END AS MaxAge
+FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent
+WHERE AgeGroup IS NOT NULL;
+
+USE Malaria_DB;
+SELECT * FROM  DimAgeGroup;

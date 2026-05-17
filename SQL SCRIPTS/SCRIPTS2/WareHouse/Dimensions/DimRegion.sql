@@ -8,3 +8,11 @@ CREATE TABLE DimRegion(
 );
 GO
 
+
+
+/**Inserting Data Into Region dimension **/
+INSERT INTO DimRegion(Region)
+SELECT DISTINCT Region FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent;
+ 
+
+SELECT * FROM DimRegion;

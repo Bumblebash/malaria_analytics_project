@@ -54,3 +54,17 @@ EXEC sp_help Fact_Malaria;
 
 
 SELECT * FROM Fact_Malaria;
+
+EXEC sp_pkeys Fact_Malaria;
+ALTER TABLE Fact_Malaria
+DROP CONSTRAINT FK_Fact_Gender;
+
+ALTER TABLE Fact_Malaria 
+ADD CONSTRAINT FK_Fact_Gender 
+FOREIGN KEY (GenderKey)
+REFERENCES DimGender(GenderKey);
+
+
+
+/**INSERTION OF DATA INTO THE FACT TABLE **/
+
