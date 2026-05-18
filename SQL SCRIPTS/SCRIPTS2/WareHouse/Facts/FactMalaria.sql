@@ -52,19 +52,64 @@ CREATE TABLE Fact_Malaria(
 );
 EXEC sp_help Fact_Malaria;
 
+ALTER TABLE FactMalaria ADD COLUMN TotalCas
+
 
 SELECT * FROM Fact_Malaria;
 
 EXEC sp_pkeys Fact_Malaria;
 ALTER TABLE Fact_Malaria
-DROP CONSTRAINT FK_Fact_Gender;
+DROP CONSTRAINT FK_Fact_Population;
 
 ALTER TABLE Fact_Malaria 
-ADD CONSTRAINT FK_Fact_Gender 
-FOREIGN KEY (GenderKey)
-REFERENCES DimGender(GenderKey);
+ADD CONSTRAINT FK_Fact_Population 
+FOREIGN KEY (PopulationKey)
+REFERENCES DimPopulation(PopulationKey);
+
+SELECT * FROM Fact_Malaria;
 
 
 
 /**INSERTION OF DATA INTO THE FACT TABLE **/
 
+INSERT INTO Fact_Malaria(RegionKey, DistrictKey,DateKey, Genderkey, AgeKey, ConfirmedCases,TreatedCases, TotalCases)
+SELECT 
+     d.DateKey,
+     dist.DistrictKey,
+     dist.RegionKey,
+     age.AgeKey,
+     gen.GenderKey,
+     m.ConfirmedCases,
+     m.TreatedCasesRecorded,
+     m.Population
+FROM Stg_Malaria m
+
+JOIN DimDate d ON m.Year = d.Year AND d.Month = m.Month
+JOIN DimDistrict dist ON m.District = dist.DistrictName
+JOIN DimAgeGroup age ON m.AgeGroup = age.AgeGroup
+JOIN DimGender gen ON m.Gender = gen.Gender
+;
+
+INSERT INTO Fact_Malaria(RegionKey,DistrictKey, PopulationKey, DateKey, GenderKey, AgeKey, ConfirmedCases, TreatedCases, TotalCases)
+SELECT
+       dist.RegionKey,
+       dist. DistrictKey,
+       p.PopulationKey,
+       d.DateKey,
+       gen.GenderKey,
+       age.AgeKey,
+       m.ConfirmedCases,
+       m.TreatedCases,
+       m.TotalCasesRecorded As TotalCases
+FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent m
+JOIN DimDate d ON m.Year = d.Year AND d.Month = m.Month
+JOIN Dimpopulation p ON m.District = p.DistrictName
+JOIN DimDistrict dist ON m.District = dist.DistrictName
+JOIN DimAgeGroup age ON m.AgeGroup = age.AgeGroup
+JOIN DimGender gen ON m.Gender = gen.Gender
+;
+
+
+SELECT * FROM Fact_Malaria;
+USE MalariaLanding_DB;
+SELECT * FROM Stg_Malaria_Permanent;
