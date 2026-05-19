@@ -176,3 +176,6 @@ FROM FactMalaria f
 
 
    EXEC sp_help Stg_Malaria;
+
+
+   SELECT * FROM FactMalaria;

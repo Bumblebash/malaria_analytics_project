@@ -45,8 +45,80 @@ SELECT
        population_2024 p,
        DistrictName d
        FROM [MalariaLanding_DB].dbo.Stg_Population_Permanent p
-       INNER JOIN [MalariaWareHouse_DB].dbo.DimDistrict d
+        JOIN [MalariaWareHouse_DB].dbo.DimDistrict d
        ON p.District  = d.DistrictName ;
 
 
        SELECT * FROM DimPopulation;
+
+       TRUNCATE TABLE Dimpopulation;
+
+       
+       SELECT DISTINCT p.District AS MissingDistrictFromStaging
+FROM [MalariaLanding_DB].dbo.Stg_Population_Permanent p
+LEFT JOIN [MalariaWareHouse_DB].dbo.DimDistrict d ON p.District = d.DistrictName
+WHERE d.DistrictName IS NULL;
+
+
+DECLARE @cols NVARCHAR(MAX);
+
+SELECT @cols = STRING_AGG(CAST(QUOTENAME(COLUMN_NAME) AS NVARCHAR(MAX)), ',')
+
+FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='DimPopulation'
+AND (
+ COLUMN_NAME LIKE '%2020%'
+ OR COLUMN_NAME LIKE '%2021%'
+ OR COLUMN_NAME LIKE '%2022%'
+ OR COLUMN_NAME LIKE '%2023%'
+ OR COLUMN_NAME  LIKE '%2024%'
+);
+DECLARE @sql NVARCHAR(MAX);
+SET @sql= '
+WITH UNPIVOTED AS (
+SELECT 
+PopulationKey,
+DistrictName,
+ColName,
+Value
+FROM DimPopulation
+UNPIVOT(
+    Value FOR ColName IN ('+ @cols +')
+) u 
+),
+PARSED AS (
+    SELECT 
+         PopulationKey,
+         DistrictName,
+         CAST(RIGHT(ColName,4) AS INT) AS Year,
+         Value
+    FROM Unpivoted
+)
+SELECT * FROM PARSED;
+
+'
+
+EXEC sp_executesql @sql;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+USE MalariaLanding_DB;
+SELECT * FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent;
