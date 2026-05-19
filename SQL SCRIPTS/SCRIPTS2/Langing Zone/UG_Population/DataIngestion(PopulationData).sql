@@ -1,5 +1,6 @@
 USE MalariaLanding_DB;
 
+
 WITH rate AS(
 SELECT
 	Region,
@@ -35,8 +36,8 @@ SELECT
 	  District,
 	  est_2020 AS Population_2020,
 	  est_2021 AS Population_2021,
-	  est_2021 AS Population_2022,
-	  est_2022 AS Popualtion_2023,
+	  est_2022 AS Population_2022,
+	  est_2023 AS Popualtion_2023,
 	  population_2024 AS Population_2024
 	FROM Estimated_population;
 
@@ -44,4 +45,4 @@ GO
 
 
 
-SELECT * FROM Stg_Population_Permanent;
+

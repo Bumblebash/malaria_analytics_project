@@ -28,5 +28,7 @@ CREATE INDEX IX_PopnStg_Grains ON Stg_Population_Permanent(District, Region)
 
 SELECT * FROM Stg_Population_Permanent;
 
+
 --Renaming a column name
+EXEC sp_rename 'Stg_Population_Permanent.Popualation_2022', 'Population_2022', 'column';
 EXEC sp_rename 'Stg_Population_Permanent.INgestionTimestamp', 'IngestionTimestamp','column';

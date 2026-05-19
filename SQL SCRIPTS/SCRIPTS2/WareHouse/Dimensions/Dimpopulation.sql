@@ -2,69 +2,28 @@ USE MalariaWareHouse_DB;
 
 CREATE TABLE Dimpopulation(
         PopulationKey INT IDENTITY(1,1) PRIMARY KEY,
-        RegionKey INT NOT NULL,
-        DistrictKey INT NOT NULL,
-        population_2020 INT NULL,
-        population_2021 INT NULL,
-        population_2022 INT NULL,
-        population_2023 INT NULL,
-        ppulation_2024 INT NULL,
-
---Constraint
-
- CONSTRAINT FK_Population_Region
-          FOREIGN KEY(RegionKey)
-          REFERENCES DimRegion(RegionKey),
-
-CONSTRAINT FK_Population_District
-           FOREIGN KEY(DistrictKey)
-           REFERENCES DimDistrict(DistrictKey)
+        Region NVARCHAR NOT NULL,
+        DistrictName NVARCHAR NOT NULL,
+        Year INT,
+        Estimated_Population INT
 
 );
-DROP TABLE Dimpopulation;
 
-EXEC sp_help Dimpopulation;
+ALTER TABLE DimPopulation ALTER COLUMN Region NVARCHAR(200) ;
+ALTER TABLE DimPopulation ALTER COLUMN DistrictName NVARCHAR(200);
 
 SELECT * FROM DimPopulation;
 
-ALTER TABLE Dimpopulation DROP COLUMN DistrictName;
-ALTER TABLE DimPopulation ADD  Region NVARCHAR;
-ALTER TABLE DimPopulation ADD DistrictName VARCHAR(30) NOT NULL;
-ALTER TABLE DimPopulation DROP COLUMN Region;
-ALTER TABLE DimPopulation ALTER COLUMN Region NVARCHAR(120) NOT NULL;
-EXEC sp_rename 'DimPopulation.ppulation_2024', 'population_2024', 'COLUMN';
-SELECT *  FROM DimPopulation;
-
-/**Ingestion ofPopulation Data into DimPopulation**/
-INSERT INTO DimPopulation( population_2020, population_2021, population_2022, population_2023, population_2024, DistrictName)
-SELECT 
-       population_2020 p,
-       population_2021 p,
-       population_2022 p,
-       population_2023 p,
-       population_2024 p,
-       DistrictName d
-       FROM [MalariaLanding_DB].dbo.Stg_Population_Permanent p
-        JOIN [MalariaWareHouse_DB].dbo.DimDistrict d
-       ON p.District  = d.DistrictName ;
 
 
-       SELECT * FROM DimPopulation;
-
-       TRUNCATE TABLE Dimpopulation;
-
-       
-       SELECT DISTINCT p.District AS MissingDistrictFromStaging
-FROM [MalariaLanding_DB].dbo.Stg_Population_Permanent p
-LEFT JOIN [MalariaWareHouse_DB].dbo.DimDistrict d ON p.District = d.DistrictName
-WHERE d.DistrictName IS NULL;
-
+/**Insertion of Data into a Dimpopulation**/
 
 DECLARE @cols NVARCHAR(MAX);
 
 SELECT @cols = STRING_AGG(CAST(QUOTENAME(COLUMN_NAME) AS NVARCHAR(MAX)), ',')
 
-FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='DimPopulation'
+FROM [MalariaLanding_DB].INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Stg_Population_Permanent'
+AND TABLE_SCHEMA = 'dbo'
 AND (
  COLUMN_NAME LIKE '%2020%'
  OR COLUMN_NAME LIKE '%2021%'
@@ -76,28 +35,46 @@ DECLARE @sql NVARCHAR(MAX);
 SET @sql= '
 WITH UNPIVOTED AS (
 SELECT 
-PopulationKey,
-DistrictName,
+Region,
+District,
 ColName,
 Value
-FROM DimPopulation
+FROM [MalariaLanding_DB].dbo.Stg_Population_Permanent
 UNPIVOT(
     Value FOR ColName IN ('+ @cols +')
 ) u 
 ),
-PARSED AS (
-    SELECT 
-         PopulationKey,
-         DistrictName,
-         CAST(RIGHT(ColName,4) AS INT) AS Year,
-         Value
-    FROM Unpivoted
+PARSED AS(
+SELECT Region,
+District,
+CAST(RIGHT(ColName,4) AS INT) AS Year,
+Value AS Estimated_population
+FROM UNPIVOTED
 )
-SELECT * FROM PARSED;
+INSERT INTO Dimpopulation(Region, DistrictName ,Year, Estimated_Population)
+SELECT Region,
+District  AS DistrictName,
+Year,
+Estimated_Population
+FROM PARSED
+;
 
-'
+    '
 
 EXEC sp_executesql @sql;
+SELECT * FROM Dimpopulation;
+
+
+PARSED AS(
+SELECT
+Region,
+District,
+CAST(RIGHT(ColName,4) AS INT) AS Year,
+Value AS Estimated_population
+FROM UNPIVOTED
+)
+SELECT * FROM  PARSED
+WHERE Estimated_Population IS NULL
 
 
 
@@ -118,7 +95,17 @@ EXEC sp_executesql @sql;
 
 
 
-
-
-USE MalariaLanding_DB;
-SELECT * FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent;
+SELECT 
+    src.Region,
+    src.District,
+    unpiv.ColName,
+    unpiv.[Value]
+FROM [MalariaLanding_DB].dbo.Stg_Population_Permanent AS src
+CROSS APPLY (
+    VALUES 
+        ('Population_2020', src.Population_2020),
+        ('Population_2021', src.Population_2021),
+        ('Population_2022', src.Population_2022), -- If this is NULL, it will now appear in your results!
+        ('Population_2023', src.Population_2023),
+        ('Population_2024', src.Population_2024)
+) AS unpiv(ColName, [Value]);
