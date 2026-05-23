@@ -15,9 +15,9 @@ DECLARE @cols NVARCHAR(MAX);
            OR COLUMN_NAME LIKE '105-EP01d%' -- Treated Cases
            OR COLUMN_NAME LIKE '105-MC04%'  -- Malaria in pregnancy
            OR COLUMN_NAME LIKE '105-EP01b%' --TotalCasesRecorded(Confirmed & Unconfirmed)
-          );
+          );'
 
-DECLARE @sql NVARCHAR(MAX);
+'DECLARE @sql NVARCHAR(MAX);
         SET @sql = '
         WITH Unpivoted AS (
             SELECT

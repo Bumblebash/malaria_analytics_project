@@ -2,10 +2,23 @@ USE MalariaWareHouse_DB;
 
 ---GENDER DIMENSION(DimGender)
 CREATE TABLE DimGender(
-GenderKey INT PRIMARY KEY,
-Gender VARCHAR(10) NOT NULL UNIQUE
+	GenderKey  INT IDENTITY(1,1) PRIMARY KEY,
+	Gender VARCHAR(20) NOT NULL UNIQUE
 );
-GO 
+
+
+
+
+
+
+
+TRUNCATE TABLE DimGender;
+
+
+
+
+
+
 
 EXEC sp_fkeys DimGender;
 
