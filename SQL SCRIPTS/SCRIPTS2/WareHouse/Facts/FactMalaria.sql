@@ -6,7 +6,6 @@ CREATE TABLE Fact_Malaria(
        FactID  BIGINT IDENTITY(1,1) PRIMARY KEY,
        RegionKey INT NOT NULL,
        DistrictKey INT NOT NULL,
-       PopulationKey INT NOT NULL,
        DateKey INT NOT NULL,
        Genderkey INT NOT NULL,
        AgeKey INT NOT NULL,
@@ -14,6 +13,7 @@ CREATE TABLE Fact_Malaria(
        --Measures
        ConfirmedCases INT NOT NULL,
        TreatedCases INT NOT NULL,
+       PregnantCases INT NOT NULL,
        TotalCases INT NOT NULL,
 
        LoadDate DATETIME DEFAULT GETDATE(),
@@ -34,11 +34,6 @@ CREATE TABLE Fact_Malaria(
                    FOREIGN KEY (DistrictKey)
                    REFERENCES DimDistrict(Districtkey),
 
-        ---PopulationConstraint--
-        CONSTRAINT FK_Fact_Population
-                   FOREIGN KEY (PopulationKey)
-                   REFERENCES DimPopulation(PopulationKey),
-
         ----Gender Constraint--
         CONSTRAINT FK_Fact_Gender
                    FOREIGN KEY (GenderKey)
@@ -52,59 +47,53 @@ CREATE TABLE Fact_Malaria(
 );
 EXEC sp_help Fact_Malaria;
 
+ALTER TABLE Fact_Malaria ADD CONSTRAINT FK_Fact_Gender
+    FOREIGN KEY (GenderKey)
+    REFERENCES DimGender(GenderKey);
+
 ALTER TABLE FactMalaria ADD COLUMN TotalCases
 
 ALTER TABLE Fact_Malaria ADD  PopulationKey INT ;
 ALTER TABLE Fact_Malaria ALTER COLUMN  PopulationKey INT NOT NULL;
 SELECT * FROM Fact_Malaria;
 
-EXEC sp_pkeys Fact_Malaria;
+EXEC sp_fkeys 'Fact_Malaria';
+EXEC sp_help Fact_Malaria;
 ALTER TABLE Fact_Malaria
 DROP CONSTRAINT FK_Fact_Gender;
 
 ALTER TABLE Fact_Malaria DROP COLUMN PopulationKey;
 
-ALTER 
+ 
 
-ALTER TABLE Fact_Malaria 
+ALTER  TABLE Fact_Malaria 
 ADD CONSTRAINT FK_Fact_Gender 
-FOREIGN KEY (PopulationKey)
-REFERENCES DimPopulation(PopulationKey);
+FOREIGN KEY (GenderKey)
+REFERENCES DimGender(GenderKey);
+GO
 
-SELECT * FROM Fact_Malaria;
+
+ALTER TABLE Fact_Malaria DROP COLUMN GenderKey  
+
+ALTER TABLE Fact_Malaria
+DROP CONSTRAINT  FK_Fact_Gender;
+
+
+
 
 
 
 /**INSERTION OF DATA INTO THE FACT TABLE **/
-
-INSERT INTO Fact_Malaria(RegionKey, DistrictKey,DateKey, Genderkey, AgeKey, ConfirmedCases,TreatedCases, TotalCases)
-SELECT 
-     d.DateKey,
-     dist.DistrictKey,
-     dist.RegionKey,
-     age.AgeKey,
-     gen.GenderKey,
-     m.ConfirmedCases,
-     m.TreatedCasesRecorded,
-     m.Population
-FROM Stg_Malaria m
-
-JOIN DimDate d ON m.Year = d.Year AND d.Month = m.Month
-JOIN DimDistrict dist ON m.District = dist.DistrictName
-JOIN DimAgeGroup age ON m.AgeGroup = age.AgeGroup
-JOIN DimGender gen ON m.Gender = gen.Gender
-;
-
-INSERT INTO Fact_Malaria(RegionKey,DistrictKey, DateKey, GenderKey, AgeKey, ConfirmedCases, TreatedCases, TotalCases)
+INSERT INTO Fact_Malaria(RegionKey,DistrictKey, DateKey, GenderKey, AgeKey, ConfirmedCases, TreatedCases, PregnantCases, TotalCases)
 SELECT
        dist.RegionKey,
        dist. DistrictKey,
-       --p.PopulationKey,
        d.DateKey,
        gen.GenderKey,
        age.AgeKey,
        m.ConfirmedCases,
        m.TreatedCases,
+       m.PregnancyCases,
        m.TotalCasesRecorded As TotalCases
 FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent m
 JOIN DimDate d ON m.Year = d.Year AND d.Month = m.Month
@@ -114,7 +103,6 @@ JOIN DimAgeGroup age ON m.AgeGroup = age.AgeGroup
 JOIN DimGender gen ON m.Gender = gen.Gender
 ;
 
-TRUNCATE TABLE Fact_Malaria;
+
+
 SELECT * FROM Fact_Malaria;
-USE MalariaLanding_DB;
-SELECT * FROM Stg_Malaria_Permanent;
