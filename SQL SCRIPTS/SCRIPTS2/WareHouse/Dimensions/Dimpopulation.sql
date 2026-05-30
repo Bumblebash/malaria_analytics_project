@@ -8,12 +8,11 @@ CREATE TABLE Dimpopulation(
         Year INT,
         Estimated_Population INT
 
-        --Constraint
-        CONSTRAINT FK_Fact_District1
-                FOREIGN KEY (DistrictKey)
-                REFERENCES DimDistrict(DistrictKey)
 
 );
+
+DROP TABLE DimPopulation;
+
 
 
 
