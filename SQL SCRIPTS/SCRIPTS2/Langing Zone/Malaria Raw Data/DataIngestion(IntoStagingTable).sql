@@ -15,9 +15,9 @@ DECLARE @cols NVARCHAR(MAX);
            OR COLUMN_NAME LIKE '105-EP01d%' -- Treated Cases
            OR COLUMN_NAME LIKE '105-MC04%'  -- Malaria in pregnancy
            OR COLUMN_NAME LIKE '105-EP01b%' --TotalCasesRecorded(Confirmed & Unconfirmed)
-          );'
-
-'DECLARE @sql NVARCHAR(MAX);
+          );
+          
+          DECLARE @sql NVARCHAR(MAX);
         SET @sql = '
         WITH Unpivoted AS (
             SELECT
@@ -163,3 +163,31 @@ FROM
        AND TABLE_SCHEMA = 'dbo';
 
 SELECT * FROM Stg_Malaria_Permanent;
+
+
+
+
+
+SELECT * FROM Malaria2020;
+
+
+
+
+
+
+
+CASE 
+            WHEN Value IS NULL THEN ''NotReported''
+            WHEN Value = 0 THEN ''Reported_Zero_Activity''
+            WHEN Value IS NULL AND COLUMN_NAME LIKE ''%105-MC04%'' AND Gender = ''Male''  THEN ''NotApplicable''
+            ELSE ''VALID_ENTRY''
+        END AS DataQualityFlag
+
+
+
+         CASE 
+        WHEN  Value IS NULL THEN ''NotReported''
+        WHEN  Value = 0 THEN ''Reported_Zero_Cases''
+        WHEN  Value IS NULL AND CaseType = ''PregnancyCases'' AND Gender = ''Male'' THEN ''NotApplicable''
+        ELSE ''VALID_ENTRY''
+   END AS DataQualityFlag

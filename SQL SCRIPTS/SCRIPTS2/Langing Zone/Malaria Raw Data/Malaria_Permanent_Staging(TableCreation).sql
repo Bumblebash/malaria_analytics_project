@@ -1,4 +1,4 @@
-USE Malaria_DB1;
+USE MalariaLanding_DB;
 --DATA MIGRATION
 SELECT * INTO Malaria_DB1.dbo.Malaria2024
 FROM Malaria_DB.dbo.Malaria2024;
@@ -15,11 +15,16 @@ CREATE TABLE Stg_Malaria_Permanent (
 	AgeGroup VARCHAR(50) NOT NULL,
 	Gender VARCHAR(10) NOT NULL,
 
+
 	---Fact/Measures
 	ConfirmedCases INT, 
 	TreatedCases INT,
 	PregnancyCases INT,
-	Population INT,
+	TotalCasesRecorded INT,
+
+	---DataQuality Flag
+	DataQualityFlag VARCHAR(50),
+
 	
 	--Audit/Governance  Columns
 	IngestionTimestamp DATETIME DEFAULT GETDATE(),
@@ -34,8 +39,8 @@ CREATE INDEX IX_Stg_Grains ON Stg_Malaria_Permanent(Region, District, Year, Mont
 GO 
 
 
----Altering the Permanent Staging to include TotalCases Recorded(Confirmed and Unconfirmed)
-ALTER TABLE Stg_Malaria_Permanent ADD  TotalCasesRecorded INT;
+
+
 
 
 
