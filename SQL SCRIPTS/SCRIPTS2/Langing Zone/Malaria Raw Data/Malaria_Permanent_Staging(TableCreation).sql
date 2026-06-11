@@ -40,7 +40,7 @@ GO
 
 
 
-
+SELECT * FROM Stg_Malaria_Permanent;
 
 
 
