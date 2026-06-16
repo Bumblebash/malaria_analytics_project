@@ -15,6 +15,29 @@ DECLARE @cols NVARCHAR(MAX);
            OR COLUMN_NAME LIKE '105-EP01d%' -- Treated Cases
            OR COLUMN_NAME LIKE '105-MC04%'  -- Malaria in pregnancy
            OR COLUMN_NAME LIKE '105-EP01b%' --TotalCasesRecorded(Confirmed & Unconfirmed)
+
+---Prove Data Qaulity 
+DECLARE @SourceCases INT, @TargetCases INT;
+
+---Grab Count From destination  from staging table
+
+SELECT @SourceCases = SUM(TotalCasesRecorded)
+FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent;
+
+---Grab Count FROM destination fact table
+SELECT @TargetCases = SUM(TotalCases)
+FROM [MalariaWareHouse_DB].dbo.Fact_Malaria;
+
+--Log Results to Validation Table.
+INSERT INTO DataQualityChecks(BatchID, TargetTable, MetricName, SourceValue, TargetValue, Variance, CheckResult, ActionTaken)
+VALUES (
+		BatchID, 'Fact_Malaria', 'TotalCases_Reconciliation',
+		@SourceCases, @TargetCases, (@SourceCases - @TargetCases),
+		CASE WHEN (@SourceCases - @TargetCases) = 0 THEN 
+		'PASS' ELSE 'FAIL' END,
+		CASE WHEN (@SourceCases - @TargetCases) = 0 THEN
+		'LOG_ONLY' ELSE 'HALT_PIPELINE' END
+);
           );
           
           DECLARE @sql NVARCHAR(MAX);
@@ -173,7 +196,7 @@ SELECT * FROM Malaria2020;
 
 
 
-
+TRUNCATE TABLE Stg_Malaria_Permanent;
 
 
 CASE 

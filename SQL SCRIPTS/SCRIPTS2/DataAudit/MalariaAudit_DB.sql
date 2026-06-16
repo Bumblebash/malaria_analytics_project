@@ -1,0 +1,4 @@
+IF DB_ID('MalariaAudit') IS NULL 
+BEGIN 
+	CREATE DATABASE MalariaAudit;
+END
