@@ -1,21 +1,28 @@
 USE MalariaWareHouse_DB;
 
+
+
+
 CREATE TABLE DimDistrict(
-DistrictKey INT IDENTITY(1,1) PRIMARY KEY,
-DistrictName NVARCHAR(120) NOT NULL,
-RegionKey INT NOT NULL,
-IsCity BIT DEFAULT 0,
+	DistrictKey INT IDENTITY(1,1) PRIMARY KEY,
+	DistrictName NVARCHAR(120) NOT NULL,
+	RegionKey INT NOT NULL,
+	IsCity BIT DEFAULT 0,
+
+---SCD2 Tracking Columns
+ValidFrom DATE NOT NULL,
+ValidTo DATE NULL,
+IsCurrent BIT DEFAULT 1,
 
 --Constraint
 CONSTRAINT FK_District_Region
      FOREIGN KEY(RegionKey)
      REFERENCES DimRegion(RegionKey)
-
 );
 
 SELECT * FROM DimDistrict;
 /**Insertion of data into the DimDistrict**/
-INSERT INTO DimDistrict (DistrictName, RegionKey, IsCity)
+INSERT INTO DimDistrict (DistrictName, RegionKey, IsCity, ValidFrom , ValidTo, IsCurrent)
 SELECT DISTINCT
         s.District,
 		r.RegionKey,
@@ -30,8 +37,11 @@ WHERE s.District LIKE '%District%'
 	  AND s.Region <> s.District;
 
 
-	  SELECT * FROM DimDistrict;
 
-	  SELECT COUNT(*) FROM DimDistrict WHERE DistrictName LIKE '%District%';
+ALTER TABLE DimDistrict DROP CONSTRAINT FK_District_Region;
+DROP TABLE DimDistrict;
 
-	  SELECT * FROM DimDistrict WHERE DistrictName LIKE '%District%';
+
+SELECT * FROM DimDistrict;
+	
+EXEC sp_help DimDistrict;

@@ -47,6 +47,11 @@ CREATE TABLE Fact_Malaria(
 );
 EXEC sp_help Fact_Malaria;
 
+
+SELECT * FROM Fact_Malaria;
+
+
+ALTER TABLE Fact_Malaria DROP constraint  FK_Fact_District;
 ALTER TABLE Fact_Malaria ADD CONSTRAINT FK_Fact_Gender
     FOREIGN KEY (GenderKey)
     REFERENCES DimGender(GenderKey);

@@ -1,7 +1,7 @@
 
 USE MalariaLanding_DB;
 
-
+USE MalariaAudit;
 ---DATA INGESTION INTO THE PERMANENT STAGING TABLE
 
 DECLARE @cols NVARCHAR(MAX);
@@ -15,7 +15,7 @@ DECLARE @cols NVARCHAR(MAX);
            OR COLUMN_NAME LIKE '105-EP01d%' -- Treated Cases
            OR COLUMN_NAME LIKE '105-MC04%'  -- Malaria in pregnancy
            OR COLUMN_NAME LIKE '105-EP01b%' --TotalCasesRecorded(Confirmed & Unconfirmed)
-
+           );
 ---Prove Data Qaulity 
 DECLARE @SourceCases INT, @TargetCases INT;
 
@@ -38,12 +38,13 @@ VALUES (
 		CASE WHEN (@SourceCases - @TargetCases) = 0 THEN
 		'LOG_ONLY' ELSE 'HALT_PIPELINE' END
 );
-          );
+          
           
           DECLARE @sql NVARCHAR(MAX);
         SET @sql = '
         WITH Unpivoted AS (
             SELECT
+                organisationunitid AS FacilityID,
                 orgunitlevel2 AS Region,
                 organisationunitname AS District,
                 ColName,
@@ -55,6 +56,7 @@ VALUES (
         ),
         Parsed AS (
             SELECT 
+                FacilityID,
                 Region, 
                 District,
                 CAST(RIGHT(ColName,4) AS INT) AS Year,
@@ -98,6 +100,7 @@ VALUES (
             FROM Unpivoted
         )
         INSERT INTO Stg_Malaria_Permanent(
+            FacilityID,
             Region,
             District,
             Year,
@@ -110,6 +113,7 @@ VALUES (
             TotalCasesRecorded
         )
         SELECT 
+             FacilityID,
              Region,
              District,
              Year,
@@ -122,6 +126,7 @@ VALUES (
              SUM(CASE WHEN CaseType = ''TotalCasesRecorded'' THEN Value ELSE 0 END) AS TotalCasesRecorded
         FROM Parsed
         GROUP BY 
+               FacilityID,
                Region,
                District,
                Year, 
@@ -134,7 +139,7 @@ EXEC sp_executesql @sql
 ;
 GO
 
-
+TRUNCATE TABLE 
 
 
 
@@ -214,3 +219,6 @@ CASE
         WHEN  Value IS NULL AND CaseType = ''PregnancyCases'' AND Gender = ''Male'' THEN ''NotApplicable''
         ELSE ''VALID_ENTRY''
    END AS DataQualityFlag
+
+
+   SELECT * FROM DataQualityChecks ;

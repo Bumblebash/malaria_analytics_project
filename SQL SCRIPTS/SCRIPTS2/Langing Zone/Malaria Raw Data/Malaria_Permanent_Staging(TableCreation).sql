@@ -39,7 +39,7 @@ CREATE INDEX IX_Stg_Grains ON Stg_Malaria_Permanent(Region, District, Year, Mont
 GO 
 
 
-
+ALTER TABLE Stg_Malaria_Permanent ADD  FacilityID NVARCHAR(50) NOT NULL;
 SELECT * FROM Stg_Malaria_Permanent;
 
 

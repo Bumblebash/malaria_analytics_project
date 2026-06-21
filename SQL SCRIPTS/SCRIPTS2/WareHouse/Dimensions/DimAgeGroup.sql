@@ -43,18 +43,3 @@ SELECT * FROM  DimAgeGroup;
 
 
 
-
-
-
-
-
-SELECT * FROM DimDistrict
-SELECT * FROM DimDate
-SELECT * FROM DimGender
-SELECT * FROM DimAgeGroup
-SELECT * FROM DimRegion
-SELECT * FROM FactMalaria;
-SELECT * FROM DimPopulation;
-
-
-SELECT * FROM DimDistrict WHERE DistrictName  LIKE '%District%';

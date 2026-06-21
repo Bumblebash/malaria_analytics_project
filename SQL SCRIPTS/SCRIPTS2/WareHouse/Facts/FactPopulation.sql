@@ -28,6 +28,10 @@ SELECT
  WHERE d.Month = 1
 ;
 
+
+
+ALTER TABLE Fact_Population DROP CONSTRAINT FK_Popn_District;
+
  SELECT * FROM Fact_Population;
 
  TRUNCATE TABLE Fact_population;

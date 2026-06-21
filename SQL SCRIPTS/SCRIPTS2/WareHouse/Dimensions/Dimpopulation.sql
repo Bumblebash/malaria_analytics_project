@@ -14,6 +14,9 @@ CREATE TABLE Dimpopulation(
 DROP TABLE DimPopulation;
 
 
+ALTER TABLE DimPopulation DROP COLUMN DistrictKey;
+
+SELECT * FROM Dimpopulation;
 
 
 ALTER TABLE DimPopulation ALTER COLUMN Region NVARCHAR(200) ;
@@ -23,6 +26,7 @@ SELECT * FROM DimPopulation;
 
 
 DROP TABLE Dimpopulation;
+
 
 
 
