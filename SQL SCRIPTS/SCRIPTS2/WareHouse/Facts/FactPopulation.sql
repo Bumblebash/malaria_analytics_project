@@ -1,6 +1,7 @@
 USE MalariaWareHouse_DB;
 
 
+
 CREATE TABLE Fact_Population(
 		PopulationKey INT IDENTITY(1,1) PRIMARY KEY,
 		DistrictKey INT NOT NULL,
@@ -28,13 +29,3 @@ SELECT
  WHERE d.Month = 1
 ;
 
-
-
-ALTER TABLE Fact_Population DROP CONSTRAINT FK_Popn_District;
-
- SELECT * FROM Fact_Population;
-
- TRUNCATE TABLE Fact_population;
-
-
-SELECT * FROM DimDate;

@@ -1,6 +1,6 @@
 USE MalariaLanding_DB;
 
-
+/** Insertion of Data Into Permanent Staging Table(Population) **/ 
 WITH rate AS(
 SELECT
 	Region,
@@ -42,6 +42,7 @@ SELECT
 	FROM Estimated_population;
 
 GO 
+
 
 
 

@@ -139,86 +139,17 @@ EXEC sp_executesql @sql
 ;
 GO
 
-TRUNCATE TABLE 
-
-
-
-
-SELECT COUNT(*) As Records  FROM Stg_Malaria_Permanent;
-
-SELECT * FROM Stg_Malaria_Permanent;
-
-TRUNCATE TABLE Stg_Malaria_Permanent;
-
-
-
-SELECT COUNT(*) AS NumberofColumns
-FROM
-  INFORMATION_SCHEMA.COLUMNS
-  WHERE 
-       TABLE_NAME = 'Malaria2020'
-       AND TABLE_SCHEMA = 'dbo';
-
-       SELECT COUNT(*) AS NumberofColumns
-FROM
-  INFORMATION_SCHEMA.COLUMNS
-  WHERE 
-       TABLE_NAME = 'Malaria2021'
-       AND TABLE_SCHEMA = 'dbo';
-
-
-       SELECT COUNT(*) AS NumberofColumns
-FROM
-  INFORMATION_SCHEMA.COLUMNS
-  WHERE 
-       TABLE_NAME = 'Malaria2022'
-       AND TABLE_SCHEMA = 'dbo';
-
-
-       SELECT COUNT(*) AS NumberofColumns
-FROM
-  INFORMATION_SCHEMA.COLUMNS
-  WHERE 
-       TABLE_NAME = 'Malaria2023'
-       AND TABLE_SCHEMA = 'dbo';
-
-
-       SELECT COUNT(*) AS NumberofColumns
-FROM
-  INFORMATION_SCHEMA.COLUMNS
-  WHERE 
-       TABLE_NAME = 'Malaria2024'
-       AND TABLE_SCHEMA = 'dbo';
-
-SELECT * FROM Stg_Malaria_Permanent;
 
 
 
 
 
-SELECT * FROM Malaria2020;
 
 
 
 
-TRUNCATE TABLE Stg_Malaria_Permanent;
-
-
-CASE 
-            WHEN Value IS NULL THEN ''NotReported''
-            WHEN Value = 0 THEN ''Reported_Zero_Activity''
-            WHEN Value IS NULL AND COLUMN_NAME LIKE ''%105-MC04%'' AND Gender = ''Male''  THEN ''NotApplicable''
-            ELSE ''VALID_ENTRY''
-        END AS DataQualityFlag
 
 
 
-         CASE 
-        WHEN  Value IS NULL THEN ''NotReported''
-        WHEN  Value = 0 THEN ''Reported_Zero_Cases''
-        WHEN  Value IS NULL AND CaseType = ''PregnancyCases'' AND Gender = ''Male'' THEN ''NotApplicable''
-        ELSE ''VALID_ENTRY''
-   END AS DataQualityFlag
 
 
-   SELECT * FROM DataQualityChecks ;

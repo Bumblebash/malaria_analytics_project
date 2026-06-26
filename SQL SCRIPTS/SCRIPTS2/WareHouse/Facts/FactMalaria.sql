@@ -45,45 +45,6 @@ CREATE TABLE Fact_Malaria(
                    REFERENCES DimAgeGroup(AgeKey)                
 
 );
-EXEC sp_help Fact_Malaria;
-
-
-SELECT * FROM Fact_Malaria;
-
-
-ALTER TABLE Fact_Malaria DROP constraint  FK_Fact_District;
-ALTER TABLE Fact_Malaria ADD CONSTRAINT FK_Fact_Gender
-    FOREIGN KEY (GenderKey)
-    REFERENCES DimGender(GenderKey);
-
-ALTER TABLE FactMalaria ADD COLUMN TotalCases
-
-ALTER TABLE Fact_Malaria ADD  PopulationKey INT ;
-ALTER TABLE Fact_Malaria ALTER COLUMN  PopulationKey INT NOT NULL;
-SELECT * FROM Fact_Malaria;
-
-EXEC sp_fkeys 'Fact_Malaria';
-EXEC sp_help Fact_Malaria;
-ALTER TABLE Fact_Malaria
-DROP CONSTRAINT FK_Fact_Gender;
-
-ALTER TABLE Fact_Malaria DROP COLUMN PopulationKey;
-
- 
-
-ALTER  TABLE Fact_Malaria 
-ADD CONSTRAINT FK_Fact_Gender 
-FOREIGN KEY (GenderKey)
-REFERENCES DimGender(GenderKey);
-GO
-
-
-ALTER TABLE Fact_Malaria DROP COLUMN GenderKey  
-
-ALTER TABLE Fact_Malaria
-DROP CONSTRAINT  FK_Fact_Gender;
-
-
 
 
 
@@ -106,8 +67,8 @@ JOIN DimDate d ON m.Year = d.Year AND d.Month = m.Month
 JOIN DimDistrict dist ON m.District = dist.DistrictName
 JOIN DimAgeGroup age ON m.AgeGroup = age.AgeGroup
 JOIN DimGender gen ON m.Gender = gen.Gender
+WHERE m.ConfirmedCases IS NOT NULL AND m.TreatedCases IS NOT NULL AND m.PregnancyCases IS NOT NULL AND m.TotalCasesRecorded IS NOT NULL
 ;
 
 
 
-SELECT * FROM Fact_Malaria;

@@ -30,7 +30,7 @@ SELECT DISTINCT
        DATEPART(QUARTER, DATEFROMPARTS(Year, Month,1)),
        Month,
        DATENAME(MONTH, DATEFROMPARTS(Year, Month,1)),
-       CONCAT(Year, '_', RIGHT('0' +CAST(Month AS VARCHAR), 2))
+       CONCAT(Year, '_', RIGHT('0' + CAST(Month AS VARCHAR), 2))
 FROM [MalariaLanding_DB].dbo.Stg_Malaria_Permanent;
 
 SELECT * FROM DimDate;

@@ -7,25 +7,8 @@ CREATE TABLE Dimpopulation(
         DistrictName NVARCHAR(200) NOT NULL,
         Year INT,
         Estimated_Population INT
-
-
 );
 
-DROP TABLE DimPopulation;
-
-
-ALTER TABLE DimPopulation DROP COLUMN DistrictKey;
-
-SELECT * FROM Dimpopulation;
-
-
-ALTER TABLE DimPopulation ALTER COLUMN Region NVARCHAR(200) ;
-ALTER TABLE DimPopulation ALTER COLUMN DistrictName NVARCHAR(200);
-
-SELECT * FROM DimPopulation;
-
-
-DROP TABLE Dimpopulation;
 
 
 
@@ -47,76 +30,35 @@ AND (
 );
 DECLARE @sql NVARCHAR(MAX);
 SET @sql= '
-WITH UNPIVOTED AS (
-SELECT 
-Region,
-District,
-ColName,
-Value
-FROM [MalariaLanding_DB].dbo.Stg_Population_Permanent
-UNPIVOT(
-    Value FOR ColName IN ('+ @cols +')
-) u 
-),
-PARSED AS(
-    SELECT Region,
-    District,
-    CAST(RIGHT(ColName,4) AS INT) AS Year,
-    Value AS Estimated_population
+    WITH UNPIVOTED AS (
+        SELECT 
+        Region,
+        District,
+        ColName,
+        Value
+        FROM [MalariaLanding_DB].dbo.Stg_Population_Permanent
+        UNPIVOT(
+                Value FOR ColName IN ('+ @cols +')
+   ) u 
+    ),
+    PARSED S(
+        SELECT Region,
+        District,
+        CAST(RIGHT(ColName,4) AS INT) AS Year,
+        Value AS Estimated_population
 FROM UNPIVOTED
 )
 INSERT INTO Dimpopulation(DistrictKey,Region, DistrictName,Year, Estimated_Population)
-    SELECT 
-    d.DistrictKey,
-    p.Region,
-    p.District  AS DistrictName,
-    p.Year,
-    p.Estimated_Population
-    FROM [MalariaWareHouse_DB].dbo.DimDistrict d
+        SELECT 
+        d.DistrictKey,
+        p.Region,
+        p.District  AS DistrictName,
+        p.Year,
+        p.Estimated_Population
+        FROM [MalariaWareHouse_DB].dbo.DimDistrict d
 JOIN PARSED p ON d.DistrictName = p.District
 
  '
-
-EXEC sp_executesql @sql;
-SELECT * FROM Dimpopulation;
-
-USE MalariaWareHouse_DB;
-SELECT   *FROM DimDistrict;
-
-
-
-USE MalariaLanding_DB;
-
-SELECT *  FROM Stg_Population_Permanent;
-
-
-
-INSERT INTO Dimpopulation(Region, DistrictKey, DistrictName ,Year, Estimated_Population)
-    SELECT p.Region,
-    d.DistrictKey,
-    p.District  AS DistrictName,
-    p.Year,
-    p.Estimated_Population
-    FROM [MalariaWareHouse_DB].dbo.DimDistrict d
-JOIN PARSED p ON d.DistrictName = p.District
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 SELECT 
     src.Region,
