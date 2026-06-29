@@ -1,0 +1,42 @@
+USE MLanding1;
+
+-----Permanent Staging Table
+CREATE TABLE Stg_Malaria_Permanent(
+
+		BatchID UNIQUEIDENTIFIER NOT NULL,
+		FacilityID UNIQUEIDENTIFIER NOT NULL,
+		Region VARCHAR(100) NOT NULL,
+		District VARCHAR(100) NOT NULL,
+		Year INT NOT NULL,
+		Month INT NOT NULL,
+		AgeGroup VARCHAR(50) NOT NULL,
+		Gender VARCHAR(20) NOT NULL,
+		ConfirmedCases INT DEFAULT 0,
+		TreatedCases INT DEFAULT 0,
+		PregnancyCases INT DEFAULT 0,
+		TotalCasesRecorded INT DEFAULT 0,
+		DataQualityFlag VARCHAR(100) NULL,
+		IngestionTimestamp DATETIME DEFAULT GETDATE(),
+		PRIMARY KEY (BatchID, Region, District, Year, Month, AgeGroup, Gender)
+);
+
+
+
+---Staging Table Population
+
+CREATE TABLE Stg_Population_Permanent(
+		BatchID UNIQUEIDENTIFIER NOT NULL,
+		Region VARCHAR(100) NOT NULL,
+		District VARCHAR(100) NOT NULL,
+		Population_2020 INT NULL,
+		Population_2021  INT NULL,
+		Population_2022 INT NULL,
+		Population_2023 INT NULL,
+		Population_2024 INT NULL,
+		DataQualityFlag VARCHAR(100) NULL,
+		IngestionTimestamp DATETIME DEFAULT GETDATE(),
+		PRIMARY KEY (BatchID , Region, District)
+
+);
+
+
