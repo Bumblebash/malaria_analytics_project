@@ -4,7 +4,7 @@ USE MLanding1;
 CREATE TABLE Stg_Malaria_Permanent(
 
 		BatchID UNIQUEIDENTIFIER NOT NULL,
-		FacilityID UNIQUEIDENTIFIER NOT NULL,
+		FacilityID NVARCHAR(MAX) NOT NULL,
 		Region VARCHAR(100) NOT NULL,
 		District VARCHAR(100) NOT NULL,
 		Year INT NOT NULL,
@@ -19,6 +19,7 @@ CREATE TABLE Stg_Malaria_Permanent(
 		IngestionTimestamp DATETIME DEFAULT GETDATE(),
 		PRIMARY KEY (BatchID, Region, District, Year, Month, AgeGroup, Gender)
 );
+
 
 
 

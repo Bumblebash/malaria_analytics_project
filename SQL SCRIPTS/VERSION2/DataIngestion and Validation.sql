@@ -3,7 +3,7 @@ USE MLanding1;
 
 GO 
 
-CREATE  PROCEDURE  dbo.SP_Execute_National_Malaria_ETL
+ALTER  PROCEDURE  dbo.SP_Execute_National_Malaria_ETL
     @SourceTableName NVARCHAR(100), -- Dynamic file reference input parameter
     @ReportingYear INT
 AS
@@ -25,7 +25,7 @@ BEGIN
 
         -- 2. DYNAMICALLY PARSE VARYING 480+ SOURCE COLUMNS FROM THE LANDING MATRIX
         SELECT @ColumnList = STRING_AGG(CAST(QUOTENAME(COLUMN_NAME) AS NVARCHAR(MAX)), ',')
-        FROM MalariaLanding_DB.INFORMATION_SCHEMA.COLUMNS
+        FROM MLanding1.INFORMATION_SCHEMA.COLUMNS
         WHERE TABLE_NAME = @SourceTableName
           AND (COLUMN_NAME LIKE '105-EP01c%' 
                OR COLUMN_NAME LIKE '105-EP01d%' 
@@ -97,7 +97,7 @@ BEGIN
                     ELSE ''PASSED''
                  END
             FROM ParsedPayload
-            GROUP BY FacilityID, Region, District, Month, AgeGroup, Gender;';
+            GROUP BY FacilityID, Region, District, Month, AgeGroup, Gender, Year;';
 
         EXEC sp_executesql @DynamicSQL;
 
@@ -161,11 +161,11 @@ BEGIN
         FROM [MLanding1].dbo.Fact_Malaria WHERE BatchID = @BatchID;
 
         INSERT INTO [MLanding1].dbo.DataQualityCheckLogs(BatchID, TargetTable, MetricName, SourceValue, TargetValue, Variance, CheckResult, ActionTaken)
-        VALUES (
+        VALUES (ELSE 'FORCE_ROLLBACK' END
+        );
             @BatchID, 'Fact_Malaria', 'TotalCases_Run_Reconciliation', @SumSourceCases, @SumTargetCases, (@SumSourceCases - @SumTargetCases),
             CASE WHEN (@SumSourceCases - @SumTargetCases) = 0 THEN 'PASS' ELSE 'FAIL' END,
-            CASE WHEN (@SumSourceCases - @SumTargetCases) = 0 THEN 'COMMIT_LOAD' ELSE 'FORCE_ROLLBACK' END
-        );
+            CASE WHEN (@SumSourceCases - @SumTargetCases) = 0 THEN 'COMMIT_LOAD' 
 
         -- 8. CONDITIONAL TRANSACTION RESOLUTION BOUNDARY
         IF (@SumSourceCases - @SumTargetCases) = 0
